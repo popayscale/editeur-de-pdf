@@ -11,4 +11,4 @@ requis : pip install pymupdf pillow PyQt5 PyPDF2
 Si vous avez des erreurs avec PyQt5, essayez :
 pip install PyQt5 PyQt5-sip
 
-
+pour les html la seconde version est la plus aboutie a prioriser , ne contient que l'import d'image pour le moment.....
