@@ -195,6 +195,53 @@ button:disabled{
 }
 
 
+#rotateLeftBtn,
+#rotateRightBtn{
+
+    background:#0078d7;
+
+    color:white;
+
+    border-color:#0078d7;
+}
+
+#rotateLeftBtn:hover,
+#rotateRightBtn:hover{
+
+    background:#005fa8;
+}
+
+#rotateLeftBtn:disabled,
+#rotateRightBtn:disabled{
+
+    opacity:.4;
+
+    cursor:not-allowed;
+}
+
+
+#duplicatePageBtn{
+
+    background:#107c10;
+
+    color:white;
+
+    border-color:#107c10;
+}
+
+#duplicatePageBtn:hover{
+
+    background:#0b5d0b;
+}
+
+#duplicatePageBtn:disabled{
+
+    opacity:.4;
+
+    cursor:not-allowed;
+}
+
+
 #deletePageBtn{
 
     background:#a4262c;
@@ -958,6 +1005,27 @@ canvas{
     </button>
 
 
+    <!-- DUPLIQUER EN DERNIERE POSITION -->
+
+    <button id="duplicatePageBtn" title="Copier cette page en dernière position">
+        📄+ Copier en dernier
+    </button>
+
+
+    <!-- PIVOTER GAUCHE -->
+
+    <button id="rotateLeftBtn" title="Faire pivoter cette page vers la gauche">
+        ⟲ Pivoter
+    </button>
+
+
+    <!-- PIVOTER DROITE -->
+
+    <button id="rotateRightBtn" title="Faire pivoter cette page vers la droite">
+        Pivoter ⟳
+    </button>
+
+
     <!-- IMPRIMER -->
 
     <button id="printBtn">
@@ -1446,6 +1514,15 @@ const moveLeftBtn =
 const moveRightBtn =
     document.getElementById("moveRightBtn");
 
+const rotateLeftBtn =
+    document.getElementById("rotateLeftBtn");
+
+const rotateRightBtn =
+    document.getElementById("rotateRightBtn");
+
+const duplicatePageBtn =
+    document.getElementById("duplicatePageBtn");
+
 const printBtn =
     document.getElementById("printBtn");
 
@@ -1498,6 +1575,8 @@ let fixedImages = [];
 let pageSources = [];
 
 let pageDivs = [];
+
+let pageRotations = [];
 
 let selectedPages = new Set();
 
@@ -1559,6 +1638,7 @@ function syncActiveState(){
         fixedImages = [];
         pageSources = [];
         pageDivs = [];
+        pageRotations = [];
         selectedPages = new Set();
         currentPage = 0;
         return;
@@ -1570,6 +1650,7 @@ function syncActiveState(){
     fixedImages = doc.fixedImages;
     pageSources = doc.pageSources;
     pageDivs = doc.pageDivs;
+    pageRotations = doc.pageRotations || [];
     selectedPages = doc.selectedPages;
 
     currentPage = Math.min(
@@ -1588,6 +1669,7 @@ function saveActiveState(){
     doc.fixedImages = fixedImages;
     doc.pageSources = pageSources;
     doc.pageDivs = pageDivs;
+    doc.pageRotations = pageRotations;
     doc.currentPage = currentPage;
     doc.selectedPages = selectedPages;
 }
@@ -1710,6 +1792,21 @@ function updateMoveButtons(){
 
     deletePageBtn.disabled =
         (total <= 1);
+
+
+    /*
+        Dupliquer et pivoter ne nécessitent
+        qu'une seule page présente.
+    */
+
+    duplicatePageBtn.disabled =
+        (total < 1);
+
+    rotateLeftBtn.disabled =
+        (total < 1);
+
+    rotateRightBtn.disabled =
+        (total < 1);
 }
 
 
@@ -1902,6 +1999,9 @@ function movePage(direction){
     [pageDivs[low], pageDivs[high]] =
         [pageDivs[high], pageDivs[low]];
 
+    [pageRotations[low], pageRotations[high]] =
+        [pageRotations[high], pageRotations[low]];
+
 
     /*
         --------------------------------------------------
@@ -1933,6 +2033,433 @@ function movePage(direction){
         "Page déplacée en position " +
         (target + 1) +
         ".";
+}
+
+
+/* ==========================================================
+   ROTATION D'UNE PAGE (GAUCHE / DROITE)
+==========================================================
+
+   Fait pivoter le contenu déjà rendu de la page active
+   (rendu PDF + images fixées) de 90°, sans re-générer
+   la page depuis le PDF source.
+
+   Le canvas existant est réutilisé (mutation en place) :
+   ses dimensions, le style CSS associé, le ratio du
+   conteneur .page et les métadonnées de page (pageInfos)
+   sont mis à jour en conséquence.
+========================================================== */
+
+rotateLeftBtn.addEventListener(
+    "click",
+    function(){
+
+        rotatePage(-1);
+    }
+);
+
+
+rotateRightBtn.addEventListener(
+    "click",
+    function(){
+
+        rotatePage(1);
+    }
+);
+
+
+function rotateCanvasStepInPlace(
+    canvas,
+    clockwise
+){
+
+    const srcWidth =
+        canvas.width;
+
+    const srcHeight =
+        canvas.height;
+
+
+    const temp =
+        document.createElement("canvas");
+
+    temp.width = srcHeight;
+    temp.height = srcWidth;
+
+
+    const tctx =
+        temp.getContext(
+            "2d",
+            {alpha:false}
+        );
+
+    tctx.save();
+
+    tctx.fillStyle = "#ffffff";
+
+    tctx.fillRect(
+        0,
+        0,
+        temp.width,
+        temp.height
+    );
+
+
+    if(clockwise){
+
+        tctx.translate(temp.width, 0);
+        tctx.rotate(Math.PI / 2);
+    }
+    else{
+
+        tctx.translate(0, temp.height);
+        tctx.rotate(-Math.PI / 2);
+    }
+
+
+    tctx.drawImage(canvas, 0, 0);
+
+    tctx.restore();
+
+
+    /*
+        On redimensionne et on redessine le canvas
+        d'origine afin de conserver le même élément DOM.
+    */
+
+    canvas.width = temp.width;
+    canvas.height = temp.height;
+
+    const ctx =
+        canvas.getContext(
+            "2d",
+            {alpha:false}
+        );
+
+    ctx.drawImage(temp, 0, 0);
+}
+
+
+function rotatePage(direction){
+
+    if(
+        !pdfDocument ||
+        pageCanvases.length === 0
+    ){
+
+        alert(
+            "Aucun PDF chargé."
+        );
+
+        return;
+    }
+
+
+    /*
+        Une image non fixée ne suit pas
+        automatiquement la rotation de la page.
+    */
+
+    if(currentBox){
+
+        const confirmation =
+            confirm(
+                "Une image n'est pas encore fixée sur cette page.\n\n" +
+                "Elle sera perdue si vous faites pivoter la page. Continuer ?"
+            );
+
+
+        if(!confirmation){
+
+            return;
+        }
+
+
+        currentBox.remove();
+
+        currentBox = null;
+    }
+
+
+    const canvas =
+        pageCanvases[currentPage];
+
+    if(!canvas){
+
+        return;
+    }
+
+
+    const previousStyleWidth =
+        canvas.style.width;
+
+    const previousStyleHeight =
+        canvas.style.height;
+
+
+    rotateCanvasStepInPlace(
+        canvas,
+        direction === 1
+    );
+
+
+    /*
+        La largeur/hauteur CSS suivent
+        la rotation (inversion).
+    */
+
+    canvas.style.width =
+        previousStyleHeight || (canvas.width + "px");
+
+    canvas.style.height =
+        previousStyleWidth || (canvas.height + "px");
+
+
+    const activePageDiv =
+        pageDivs[currentPage];
+
+    if(activePageDiv){
+
+        const ratioParts =
+            (activePageDiv.style.aspectRatio || (canvas.width + " / " + canvas.height))
+                .split("/")
+                .map(function(value){
+
+                    return parseFloat(value);
+                });
+
+
+        if(
+            ratioParts.length === 2 &&
+            !isNaN(ratioParts[0]) &&
+            !isNaN(ratioParts[1])
+        ){
+
+            activePageDiv.style.aspectRatio =
+                ratioParts[1] + " / " + ratioParts[0];
+        }
+        else{
+
+            activePageDiv.style.aspectRatio =
+                canvas.width + " / " + canvas.height;
+        }
+    }
+
+
+    const info2 =
+        pageInfos[currentPage];
+
+    if(info2){
+
+        const swapWidthPt = info2.widthPt;
+        info2.widthPt = info2.heightPt;
+        info2.heightPt = swapWidthPt;
+
+        const swapWidthMM = info2.widthMM;
+        info2.widthMM = info2.heightMM;
+        info2.heightMM = swapWidthMM;
+
+        const swapPixelWidth = info2.pixelWidth;
+        info2.pixelWidth = info2.pixelHeight;
+        info2.pixelHeight = swapPixelWidth;
+    }
+
+
+    if(typeof pageRotations[currentPage] !== "number"){
+
+        pageRotations[currentPage] = 0;
+    }
+
+    pageRotations[currentPage] =
+        ((pageRotations[currentPage] + (direction === 1 ? 90 : -90)) % 360 + 360) % 360;
+
+
+    saveActiveState();
+
+    info.textContent =
+        "Page " +
+        (currentPage + 1) +
+        " pivotée.";
+}
+
+
+/* ==========================================================
+   DUPLICATION D'UNE PAGE EN DERNIERE POSITION
+==========================================================
+
+   Copie la page active (rendu + images déjà fixées)
+   et l'ajoute à la toute fin du document actif.
+
+   La page source n'est pas modifiée ; seule une copie
+   indépendante est ajoutée en dernière position.
+========================================================== */
+
+duplicatePageBtn.addEventListener(
+    "click",
+    duplicatePageToEnd
+);
+
+
+async function duplicatePageToEnd(){
+
+    if(
+        !pdfDocument ||
+        pageCanvases.length === 0
+    ){
+
+        alert(
+            "Aucun PDF chargé."
+        );
+
+        return;
+    }
+
+
+    if(currentBox){
+
+        const confirmation =
+            confirm(
+                "Une image n'est pas encore fixée sur la page active.\n\n" +
+                "Voulez-vous la fixer avant de dupliquer la page ?"
+            );
+
+
+        if(!confirmation){
+
+            return;
+        }
+
+
+        await fixImage();
+
+
+        if(currentBox){
+
+            return;
+        }
+    }
+
+
+    const sourceIndex =
+        currentPage;
+
+    const sourceCanvas =
+        pageCanvases[sourceIndex];
+
+    const sourcePageDiv =
+        pageDivs[sourceIndex];
+
+    if(
+        !sourceCanvas ||
+        !sourcePageDiv
+    ){
+
+        alert(
+            "Impossible de dupliquer cette page."
+        );
+
+        return;
+    }
+
+
+    const sourceInfo =
+        pageInfos[sourceIndex];
+
+    const sourceImages =
+        fixedImages[sourceIndex] || [];
+
+    const source =
+        pageSources[sourceIndex] || {
+            pdfDocument: pdfDocument,
+            pageNumber: sourceIndex + 1
+        };
+
+
+    const newCanvas =
+        document.createElement("canvas");
+
+    newCanvas.width = sourceCanvas.width;
+    newCanvas.height = sourceCanvas.height;
+    newCanvas.style.width = sourceCanvas.style.width;
+    newCanvas.style.height = sourceCanvas.style.height;
+
+    const newCtx =
+        newCanvas.getContext(
+            "2d",
+            {alpha:false}
+        );
+
+    newCtx.drawImage(
+        sourceCanvas,
+        0,
+        0
+    );
+
+
+    const newPageDiv =
+        document.createElement("div");
+
+    newPageDiv.className = "page";
+    newPageDiv.style.aspectRatio =
+        sourcePageDiv.style.aspectRatio;
+
+    const newWrap =
+        document.createElement("div");
+
+    newWrap.className = "canvasWrap";
+    newWrap.appendChild(newCanvas);
+    newPageDiv.appendChild(newWrap);
+
+
+    pageCanvases.push(newCanvas);
+
+    pageInfos.push(
+        Object.assign({}, sourceInfo)
+    );
+
+    fixedImages.push(
+        sourceImages.map(
+            function(item){
+
+                return Object.assign({}, item);
+            }
+        )
+    );
+
+    pageSources.push({
+        pdfDocument: source.pdfDocument,
+        pageNumber: source.pageNumber
+    });
+
+    pageDivs.push(newPageDiv);
+
+    pageRotations.push(
+        pageRotations[sourceIndex] || 0
+    );
+
+
+    pages.innerHTML = "";
+
+    pageDivs.forEach(function(pageDiv){
+
+        pages.appendChild(pageDiv);
+    });
+
+
+    rebuildTabs();
+    saveActiveState();
+
+    activatePage(
+        pageCanvases.length - 1
+    );
+
+
+    info.textContent =
+        "Page " +
+        (sourceIndex + 1) +
+        " copiée en dernière position (page " +
+        pageCanvases.length +
+        ").";
 }
 
 
@@ -2050,6 +2577,11 @@ function deletePage(){
     );
 
     pageDivs.splice(
+        removedIndex,
+        1
+    );
+
+    pageRotations.splice(
         removedIndex,
         1
     );
@@ -2426,6 +2958,10 @@ async function copyPagesToDocument(){
             pageNumber: source.pageNumber
         });
         target.pageDivs.push(newPageDiv);
+
+        target.pageRotations.push(
+            pageRotations[sourceIndex] || 0
+        );
     }
 
     target.currentPage =
@@ -2515,6 +3051,7 @@ async function loadPdf(e){
                 fixedImages: [],
                 pageSources: [],
                 pageDivs: [],
+                pageRotations: [],
                 currentPage: 0,
                 selectedPages: new Set()
             };
@@ -2610,6 +3147,8 @@ async function loadPdf(e){
                 pageDiv.appendChild(wrap);
 
                 doc.pageDivs.push(pageDiv);
+
+                doc.pageRotations.push(0);
 
                 info.textContent =
                     "Chargement " +
@@ -3948,6 +4487,101 @@ async function rerenderPage(
             ctx,
             item
         );
+    }
+
+
+    /*
+        --------------------------------------------------
+        RE-APPLICATION DE LA ROTATION
+        --------------------------------------------------
+
+        Si la page avait été pivotée avant la suppression
+        de l'image, on réapplique cette rotation au rendu
+        fraîchement reconstruit depuis le PDF source.
+    */
+
+    const rotationDegrees =
+        pageRotations[pageIndex] || 0;
+
+    if(rotationDegrees !== 0){
+
+        const steps =
+            Math.round(rotationDegrees / 90) % 4;
+
+        const previousStyleWidth =
+            canvas.style.width;
+
+        const previousStyleHeight =
+            canvas.style.height;
+
+
+        for(
+            let s = 0;
+            s < steps;
+            s++
+        ){
+
+            rotateCanvasStepInPlace(
+                canvas,
+                true
+            );
+        }
+
+
+        const activePageDiv =
+            pageDivs[pageIndex];
+
+        if(activePageDiv){
+
+            activePageDiv.style.aspectRatio =
+                canvas.width + " / " + canvas.height;
+        }
+
+
+        /*
+            Une rotation impaire (90°/270°) inverse
+            la largeur/hauteur CSS ; une rotation
+            paire (180°) les laisse inchangées.
+        */
+
+        if((steps % 2) === 1){
+
+            canvas.style.width =
+                previousStyleHeight || (canvas.width + "px");
+
+            canvas.style.height =
+                previousStyleWidth || (canvas.height + "px");
+        }
+        else{
+
+            canvas.style.width =
+                previousStyleWidth || (canvas.width + "px");
+
+            canvas.style.height =
+                previousStyleHeight || (canvas.height + "px");
+        }
+
+
+        const info2 =
+            pageInfos[pageIndex];
+
+        if(
+            info2 &&
+            (steps % 2) === 1
+        ){
+
+            const swapWidthPt = info2.widthPt;
+            info2.widthPt = info2.heightPt;
+            info2.heightPt = swapWidthPt;
+
+            const swapWidthMM = info2.widthMM;
+            info2.widthMM = info2.heightMM;
+            info2.heightMM = swapWidthMM;
+
+            const swapPixelWidth = info2.pixelWidth;
+            info2.pixelWidth = info2.pixelHeight;
+            info2.pixelHeight = swapPixelWidth;
+        }
     }
 }
 
