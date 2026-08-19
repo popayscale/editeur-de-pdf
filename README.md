@@ -2,23 +2,84 @@
 
 Petit outil permettant de manipuler des documents PDF directement depuis un navigateur.
 
-L'objectif est de proposer un outil simple pour effectuer rapidement différentes opérations sur des PDF : réorganisation des pages, suppression, duplication, rotation, copie de pages entre documents et ajout d'images.
+L'objectif est de proposer un outil simple pour effectuer différentes opérations sur les PDF :
 
-La version HTML actuelle est la version principale du projet.
+* réorganisation des pages ;
+* suppression de pages ;
+* duplication de pages ;
+* rotation ;
+* copie de pages entre plusieurs documents ;
+* ajout et positionnement d'images.
+
+Le projet existe actuellement sous **deux formes complémentaires** :
+
+* une **version HTML** utilisant PDF.js depuis un CDN ;
+* une **version locale Windows**, distribuée sous forme de ZIP et fonctionnant hors ligne.
 
 ---
 
-# 🚀 Version actuelle
+# 🚀 Versions disponibles
 
-La version à privilégier est :
+## Version HTML
+
+La version HTML principale est :
 
 ```text
 PDF_Image_Editor_MultiPDF.html
 ```
 
-Cette version fonctionne directement dans un navigateur moderne et utilise **PDF.js** pour l'affichage et la manipulation des documents PDF.
+Elle fonctionne directement dans un navigateur moderne.
 
-Le projet est toujours en développement et de nouvelles fonctionnalités pourront être ajoutées progressivement.
+Aucune installation de Python ou de bibliothèque Python n'est nécessaire pour utiliser cette version.
+
+Elle utilise actuellement **PDF.js 6.2.108** pour l'affichage et la manipulation des documents PDF.
+
+### Utilisation
+
+Il suffit d'ouvrir :
+
+```text
+PDF_Image_Editor_MultiPDF.html
+```
+
+dans un navigateur compatible.
+
+Cette version nécessite cependant un accès à Internet au démarrage afin de télécharger les bibliothèques PDF.js depuis le CDN Cloudflare.
+
+---
+
+# 🖥️ Version locale Windows
+
+Une version locale est également disponible dans le fichier :
+
+```text
+editeur-pdf-windows.zip
+```
+
+Cette version est destinée aux utilisateurs souhaitant disposer d'une version **hors ligne**, sans dépendance à un CDN externe.
+
+Elle contient notamment les bibliothèques PDF.js directement dans le dossier du programme.
+
+```text
+editeur-pdf-windows/
+├── lancer-editeur.bat
+├── server.py
+├── PDF_Image_Editor_MultiPDF.html
+├── pdf.min.mjs
+└── pdf.worker.min.mjs
+```
+
+Le traitement reste sur la machine de l'utilisateur.
+
+La version locale utilise un petit serveur Python fonctionnant uniquement sur :
+
+```text
+127.0.0.1
+```
+
+Ce serveur permet au navigateur de charger correctement les modules PDF.js locaux.
+
+Il ne s'agit pas d'un serveur distant et il n'est pas destiné à être accessible depuis le réseau.
 
 ---
 
@@ -65,7 +126,7 @@ Cela peut notamment être utilisé pour ajouter :
 * une annotation graphique ;
 * ou tout autre élément visuel.
 
-Le fonctionnement permet d'importer plusieurs images sur une même page, de les positionner correctement, puis de les fixer avant de poursuivre le travail sur une autre page.
+Il est possible d'importer plusieurs images sur une même page, de les positionner, puis de les fixer avant de poursuivre le travail sur une autre page.
 
 ---
 
@@ -82,18 +143,23 @@ Exemple :
 5. Réorganiser les pages.
 6. Supprimer les pages inutiles.
 7. Ajouter éventuellement des images.
-8. Fixer les images sur les pages.
+8. Positionner et fixer les images.
 9. Finaliser le document.
 
 ---
 
 # 🔐 Confidentialité
 
-Les PDF ouverts avec l'outil sont manipulés dans le navigateur.
+L'application est conçue pour manipuler les documents directement sur le poste de l'utilisateur.
 
-Le projet n'utilise pas de service en ligne destiné à recevoir ou stocker les documents de l'utilisateur.
+Aucun service en ligne n'est utilisé pour recevoir ou stocker les PDF traités.
 
-La version actuelle nécessite cependant le téléchargement de PDF.js depuis un CDN externe.
+La différence entre les deux versions concerne principalement le chargement de PDF.js :
+
+| Version        | PDF.js                             | Internet nécessaire      |
+| -------------- | ---------------------------------- | ------------------------ |
+| HTML           | CDN Cloudflare                     | Oui, pour charger PDF.js |
+| Locale Windows | Bibliothèques incluses dans le ZIP | Non                      |
 
 ---
 
@@ -105,7 +171,7 @@ La version actuelle utilise :
 PDF.js 6.2.108
 ```
 
-Les bibliothèques sont actuellement chargées depuis `cdnjs.cloudflare.com` :
+La version HTML charge les bibliothèques depuis `cdnjs.cloudflare.com` :
 
 ```javascript
 import * as pdfjsLib from "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/6.2.108/pdf.min.mjs";
@@ -120,29 +186,40 @@ La bibliothèque principale et le worker utilisent volontairement la même versi
 6.2.108
 ```
 
+La version locale Windows utilise ces mêmes bibliothèques, mais les fichiers sont fournis directement dans le ZIP :
+
+```text
+pdf.min.mjs
+pdf.worker.min.mjs
+```
+
+Elle ne dépend donc pas du CDN pour fonctionner.
+
 ---
 
-# 🛡️ Mise à jour de sécurité
+# 🛡️ Mise à jour de sécurité de PDF.js
 
 Le projet a été mis à jour à la suite de la découverte d'une vulnérabilité de sécurité affectant certaines versions de PDF.js.
 
-La version utilisée précédemment a donc été remplacée par :
+La version utilisée précédemment a été remplacée par :
 
 ```text
 PDF.js 6.2.108
 ```
 
-Cette version correspond à la version corrigée indiquée par Mozilla pour la vulnérabilité concernée.
+Cette version correspond à la version corrigée retenue pour le projet.
+
+La mise à jour concerne à la fois la version HTML et la version locale Windows.
 
 Le projet continuera à suivre les mises à jour de sécurité de PDF.js afin de maintenir une version à jour de la bibliothèque.
 
-> **Important :** l'utilisation d'une version corrigée de PDF.js ne constitue pas une garantie de sécurité absolue. Comme pour toute dépendance externe, les futures vulnérabilités devront être surveillées et les versions mises à jour lorsque cela sera nécessaire.
+> **Important :** l'utilisation d'une version corrigée de PDF.js ne constitue pas une garantie de sécurité absolue. Comme pour toute dépendance logicielle, les futures vulnérabilités devront être surveillées et les versions mises à jour lorsque cela sera nécessaire.
 
 ---
 
-# ☁️ Dépendance au CDN
+# ☁️ Dépendance au CDN — version HTML
 
-La version HTML actuelle utilise le CDN :
+La version HTML utilise actuellement :
 
 ```text
 https://cdnjs.cloudflare.com
@@ -155,52 +232,106 @@ pdf.min.mjs
 pdf.worker.min.mjs
 ```
 
-Cela signifie que le navigateur doit pouvoir accéder à ce domaine lors du chargement de l'application.
+Elle nécessite donc un accès à Internet au moment du chargement de l'application.
 
-Le CDN est utilisé uniquement pour fournir les bibliothèques nécessaires au fonctionnement de PDF.js.
+Cette dépendance n'existe pas dans la version locale Windows, puisque les fichiers PDF.js sont directement inclus dans le ZIP.
 
 ---
 
-# 🐍 Version Python
+# 📴 Version locale hors ligne
 
-Le dépôt contient également une ancienne version basée sur Python, utilisant notamment :
+La version :
 
-* PyMuPDF ;
-* Pillow ;
-* PyQt5 ;
-* PyPDF2.
-
-Installation :
-
-```bash
-pip install pymupdf pillow PyQt5 PyPDF2
+```text
+editeur-pdf-windows.zip
 ```
 
-En cas de problème avec PyQt5 :
+est destinée aux utilisateurs qui souhaitent travailler sans connexion Internet.
 
-```bash
-pip install PyQt5 PyQt5-sip
+Elle contient :
+
+```text
+lancer-editeur.bat
+server.py
+PDF_Image_Editor_MultiPDF.html
+pdf.min.mjs
+pdf.worker.min.mjs
 ```
 
-Cette version Python n'est actuellement pas la version principale du projet.
+## Pré-requis
+
+**Python doit être installé sur Windows.**
+
+Aucune bibliothèque Python supplémentaire n'est nécessaire.
+
+Il suffit d'avoir une installation fonctionnelle de Python permettant d'exécuter :
+
+```bash
+python --version
+```
+
+## Lancement
+
+1. Décompresser `editeur-pdf-windows.zip`.
+2. Vérifier que les fichiers sont présents dans le même dossier.
+3. Double-cliquer sur :
+
+```text
+lancer-editeur.bat
+```
+
+4. Le navigateur s'ouvre automatiquement.
+5. Utiliser normalement l'éditeur.
+
+Le serveur utilisé par `server.py` reste limité à la machine locale.
+
+Il n'est donc pas nécessaire de lancer manuellement un serveur ou d'effectuer une configuration particulière.
+
+---
+
+# 🐍 Pourquoi Python dans la version locale ?
+
+Python n'est **pas nécessaire pour la version HTML classique**.
+
+Il est utilisé uniquement dans la version locale Windows afin de lancer un petit serveur HTTP local.
+
+Cette étape est nécessaire car les navigateurs appliquent des restrictions de sécurité lorsque certains modules JavaScript sont chargés directement depuis un fichier `file://`.
+
+Le serveur Python permet donc au navigateur de charger les fichiers PDF.js locaux correctement.
+
+Il ne s'agit pas d'un serveur Internet.
+
+L'adresse utilisée est :
+
+```text
+127.0.0.1
+```
+
+qui correspond à la machine locale.
 
 ---
 
 # 📱 Autres versions
 
-Le dépôt contient également des fichiers correspondant à différentes expérimentations du projet.
+Le dépôt peut également contenir différentes versions ou expérimentations du projet.
 
-La version principale à utiliser actuellement reste :
+La version HTML principale reste :
 
 ```text
 PDF_Image_Editor_MultiPDF.html
+```
+
+La version destinée à une utilisation hors ligne sous Windows est :
+
+```text
+editeur-pdf-windows.zip
 ```
 
 ---
 
 # 🧭 État du projet
 
-### Version HTML actuelle
+## Version HTML
 
 * [x] Ouverture de plusieurs PDF
 * [x] Navigation entre les documents
@@ -217,11 +348,22 @@ PDF_Image_Editor_MultiPDF.html
 * [x] Fixation des images
 * [x] PDF.js 6.2.108
 
-### Évolutions prévues
+## Version locale Windows
 
-Version locale
+* [x] Fonctionnement hors ligne
+* [x] PDF.js fourni localement
+* [x] `pdf.min.mjs` inclus
+* [x] `pdf.worker.min.mjs` inclus
+* [x] Serveur local intégré
+* [x] Lancement simplifié avec `lancer-editeur.bat`
 
-La future version locale fera l'objet d'un **projet ou dossier dédié avec son propre README**, afin de conserver une documentation distincte de la version HTML actuelle.
+## Évolutions
+
+* [ ] Amélioration des fonctions d'édition PDF
+* [ ] Amélioration de l'interface
+* [ ] Nouvelles fonctions de manipulation des pages
+* [ ] Évolution de la version locale Windows
+* [ ] Documentation séparée et complète de la version locale
 
 ---
 
@@ -229,17 +371,32 @@ La future version locale fera l'objet d'un **projet ou dossier dédié avec son 
 
 **Petit éditeur de PDF** est un outil en développement permettant de manipuler simplement des documents PDF depuis un navigateur.
 
-La version actuelle permet notamment :
+Il existe actuellement en deux déclinaisons :
 
-* d'ouvrir plusieurs PDF ;
-* de réorganiser leurs pages ;
-* de supprimer, dupliquer ou faire pivoter des pages ;
-* de copier des pages entre plusieurs documents ;
-* d'ajouter et positionner des images ;
-* de fixer les images dans les pages.
+### 🌐 Version HTML
 
-La version actuelle utilise **PDF.js 6.2.108**, mise en place à la suite de la vulnérabilité de sécurité découverte dans les versions précédentes.
+```text
+PDF_Image_Editor_MultiPDF.html
+```
 
-La version HTML dépend actuellement du CDN `cdnjs.cloudflare.com` pour charger PDF.js.
+* aucune installation Python ;
+* utilisation directe dans un navigateur ;
+* PDF.js 6.2.108 ;
+* PDF.js téléchargé depuis cdnjs.cloudflare.com ;
+* connexion Internet nécessaire pour charger la bibliothèque.
 
-Une **version locale/autonome** est prévue ultérieurement. Elle sera développée et documentée séparément afin de ne pas mélanger les deux approches dans ce dépôt.
+### 🖥️ Version locale Windows
+
+```text
+editeur-pdf-windows.zip
+```
+
+* fonctionnement hors ligne ;
+* PDF.js fourni directement avec l'application ;
+* aucune dépendance au CDN ;
+* petit serveur Python local nécessaire au fonctionnement du navigateur ;
+* aucune donnée destinée à être envoyée vers Internet.
+
+La version locale constitue la déclinaison **hors ligne et autonome du projet**. Elle dispose de son propre README et pourra évoluer indépendamment de la version HTML.
+
+Le projet utilise actuellement **PDF.js 6.2.108**, à la suite de la mise à jour de sécurité effectuée sur les versions précédentes.
