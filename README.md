@@ -1,56 +1,245 @@
-Petit éditeur de pdf  avec 2 onglet , le premier pour ajouter des images  via import
+# Petit éditeur de PDF
 
- importer toutes les images sur une page puis les placer et ensuite les fixer avant de travailler sur une seconde page
+Petit outil permettant de manipuler des documents PDF directement depuis un navigateur.
 
-second onglet : réorganiser les pages de pdfs en ouvrant plusieurs documents , onréorganise les pages en glisser / déposer.
-On peut également supprimer des pages puis enregistrer les "colones" en un nouveau pdf.
+L'objectif est de proposer un outil simple pour effectuer rapidement différentes opérations sur des PDF : réorganisation des pages, suppression, duplication, rotation, copie de pages entre documents et ajout d'images.
 
+La version HTML actuelle est la version principale du projet.
 
-requis : pip install pymupdf pillow PyQt5 PyPDF2
+---
 
-Si vous avez des erreurs avec PyQt5, essayez :
+# 🚀 Version actuelle
+
+La version à privilégier est :
+
+```text
+PDF_Image_Editor_MultiPDF.html
+```
+
+Cette version fonctionne directement dans un navigateur moderne et utilise **PDF.js** pour l'affichage et la manipulation des documents PDF.
+
+Le projet est toujours en développement et de nouvelles fonctionnalités pourront être ajoutées progressivement.
+
+---
+
+# 📄 Fonctionnalités
+
+## Gestion de plusieurs PDF
+
+L'outil permet d'ouvrir plusieurs documents PDF simultanément et de travailler sur leurs pages.
+
+Il est notamment possible de :
+
+* ouvrir plusieurs PDF ;
+* naviguer entre les différents documents ;
+* parcourir les pages ;
+* déplacer les pages ;
+* supprimer des pages ;
+* dupliquer des pages ;
+* faire pivoter les pages ;
+* sélectionner plusieurs pages ;
+* copier des pages d'un document vers un autre ;
+* réorganiser les pages.
+
+Cette organisation permet notamment de récupérer des pages provenant de plusieurs documents afin de constituer un nouveau document.
+
+---
+
+# 🖼️ Ajout d'images
+
+L'outil permet également d'importer des images dans les pages d'un PDF.
+
+Une image peut être :
+
+* importée depuis le poste de travail ;
+* déplacée sur la page ;
+* redimensionnée ;
+* positionnée à l'endroit souhaité ;
+* puis fixée afin de l'intégrer au document.
+
+Cela peut notamment être utilisé pour ajouter :
+
+* une signature sous forme d'image ;
+* un logo ;
+* un tampon ;
+* une annotation graphique ;
+* ou tout autre élément visuel.
+
+Le fonctionnement permet d'importer plusieurs images sur une même page, de les positionner correctement, puis de les fixer avant de poursuivre le travail sur une autre page.
+
+---
+
+# 🔄 Travail avec plusieurs documents
+
+L'une des fonctions principales de l'outil est de pouvoir travailler avec plusieurs PDF simultanément.
+
+Exemple :
+
+1. Ouvrir un premier PDF.
+2. Ouvrir un second PDF.
+3. Sélectionner les pages souhaitées.
+4. Copier les pages vers le document cible.
+5. Réorganiser les pages.
+6. Supprimer les pages inutiles.
+7. Ajouter éventuellement des images.
+8. Fixer les images sur les pages.
+9. Finaliser le document.
+
+---
+
+# 🔐 Confidentialité
+
+Les PDF ouverts avec l'outil sont manipulés dans le navigateur.
+
+Le projet n'utilise pas de service en ligne destiné à recevoir ou stocker les documents de l'utilisateur.
+
+La version actuelle nécessite cependant le téléchargement de PDF.js depuis un CDN externe.
+
+---
+
+# 🌐 PDF.js
+
+La version actuelle utilise :
+
+```text
+PDF.js 6.2.108
+```
+
+Les bibliothèques sont actuellement chargées depuis `cdnjs.cloudflare.com` :
+
+```javascript
+import * as pdfjsLib from "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/6.2.108/pdf.min.mjs";
+
+pdfjsLib.GlobalWorkerOptions.workerSrc =
+    "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/6.2.108/pdf.worker.min.mjs";
+```
+
+La bibliothèque principale et le worker utilisent volontairement la même version :
+
+```text
+6.2.108
+```
+
+---
+
+# 🛡️ Mise à jour de sécurité
+
+Le projet a été mis à jour à la suite de la découverte d'une vulnérabilité de sécurité affectant certaines versions de PDF.js.
+
+La version utilisée précédemment a donc été remplacée par :
+
+```text
+PDF.js 6.2.108
+```
+
+Cette version correspond à la version corrigée indiquée par Mozilla pour la vulnérabilité concernée.
+
+Le projet continuera à suivre les mises à jour de sécurité de PDF.js afin de maintenir une version à jour de la bibliothèque.
+
+> **Important :** l'utilisation d'une version corrigée de PDF.js ne constitue pas une garantie de sécurité absolue. Comme pour toute dépendance externe, les futures vulnérabilités devront être surveillées et les versions mises à jour lorsque cela sera nécessaire.
+
+---
+
+# ☁️ Dépendance au CDN
+
+La version HTML actuelle utilise le CDN :
+
+```text
+https://cdnjs.cloudflare.com
+```
+
+pour charger :
+
+```text
+pdf.min.mjs
+pdf.worker.min.mjs
+```
+
+Cela signifie que le navigateur doit pouvoir accéder à ce domaine lors du chargement de l'application.
+
+Le CDN est utilisé uniquement pour fournir les bibliothèques nécessaires au fonctionnement de PDF.js.
+
+---
+
+# 🐍 Version Python
+
+Le dépôt contient également une ancienne version basée sur Python, utilisant notamment :
+
+* PyMuPDF ;
+* Pillow ;
+* PyQt5 ;
+* PyPDF2.
+
+Installation :
+
+```bash
+pip install pymupdf pillow PyQt5 PyPDF2
+```
+
+En cas de problème avec PyQt5 :
+
+```bash
 pip install PyQt5 PyQt5-sip
+```
 
-pour les html la seconde version est la plus aboutie a prioriser , ne contient que l'import d'image pour le moment.....
+Cette version Python n'est actuellement pas la version principale du projet.
 
+---
 
-L'outil charge au démarrage deux bibliothèques PDF.js depuis le serveur externe cdnjs.cloudflare.com.
+# 📱 Autres versions
 
- Une fois ces bibliothèques téléchargées, tous les traitements sont réalisés localement dans le navigateur de l'utilisateur.
+Le dépôt contient également des fichiers correspondant à différentes expérimentations du projet.
 
- Le PDF est lu directement depuis le poste de travail et n'est pas envoyé vers Internet.
+La version principale à utiliser actuellement reste :
 
- Les images ajoutées au document sont également traitées localement.
+```text
+PDF_Image_Editor_MultiPDF.html
+```
 
- Aucun appel fetch, API REST, WebSocket ou mécanisme d'upload n'a été identifié dans le code.
+---
 
+# 🧭 État du projet
 
- Le principal risque réside dans la dépendance à un CDN externe pour récupérer PDF.js.
- Cloudflare peut voir qu'un poste accède à sa bibliothèque, mais ne reçoit pas le contenu des PDF traités.
- Le fait que les scripts soient chargés sans blocage indique que votre environnement de sécurité les autorise actuellement.
- Le risque de fuite de données via ce code est donc très faible.
- Le risque le plus crédible serait une compromission future de la bibliothèque ou du CDN utilisé.
- Pour une entreprise classique, l'utilisation paraît acceptable avec un niveau de risque faible.
- Pour un environnement très sécurisé ou industriel, 
-il serait préférable d'héberger les bibliothèques PDF.js sur un serveur interne plutôt que de les télécharger depuis Internet.
+### Version HTML actuelle
 
+* [x] Ouverture de plusieurs PDF
+* [x] Navigation entre les documents
+* [x] Navigation entre les pages
+* [x] Réorganisation des pages
+* [x] Suppression de pages
+* [x] Duplication de pages
+* [x] Rotation des pages
+* [x] Sélection de pages
+* [x] Copie de pages entre documents
+* [x] Import d'images
+* [x] Positionnement des images
+* [x] Redimensionnement des images
+* [x] Fixation des images
+* [x] PDF.js 6.2.108
 
-Conclusion
+### Évolutions prévues
 
-À ce jour, je ne vois aucun comportement d'exfiltration de données ni de communication réseau suspecte dans ce code. Le seul flux externe observé est le téléchargement de PDF.js depuis Cloudflare. Pour un usage bureautique standard en entreprise, le risque est faible (environ 2 à 3/10). Le point d'attention principal reste la dépendance à un fournisseur externe pour charger les bibliothèques JavaScript.
+Version locale
 
+La future version locale fera l'objet d'un **projet ou dossier dédié avec son propre README**, afin de conserver une documentation distincte de la version HTML actuelle.
 
-Les seuls téléchargements externes concernent les bibliothèques PDF.js hébergées sur le CDN Cloudflare (cdnjs.cloudflare.com). Le reste du traitement est effectué localement sur le poste de travail.
+---
 
-Concernant le fait que ces scripts ne soient pas bloqués par la sécurité de votre poste, c'est un indicateur plutôt positif :
+# 📌 En résumé
 
-Le domaine cdnjs.cloudflare.com est largement utilisé dans le monde professionnel.
-Votre proxy, filtrage web ou EDR (Defender, CrowdStrike, SentinelOne, etc.) ne semble pas le considérer comme une source à bloquer.
-Si le script était considéré comme dangereux ou non conforme à la politique de l'entreprise, le téléchargement aurait probablement été bloqué ou remonté dans les journaux de sécurité.
+**Petit éditeur de PDF** est un outil en développement permettant de manipuler simplement des documents PDF depuis un navigateur.
 
-Cela ne signifie cependant pas un risque nul :
+La version actuelle permet notamment :
 
-Confiance à un fournisseur externe (Cloudflare).
-Une modification malveillante de la bibliothèque, bien que peu probable, aurait un impact potentiel sur les utilisateurs.
-Certaines entreprises imposent que toutes les bibliothèques JavaScript soient hébergées en interne afin d'éliminer cette dépendance.
+* d'ouvrir plusieurs PDF ;
+* de réorganiser leurs pages ;
+* de supprimer, dupliquer ou faire pivoter des pages ;
+* de copier des pages entre plusieurs documents ;
+* d'ajouter et positionner des images ;
+* de fixer les images dans les pages.
 
+La version actuelle utilise **PDF.js 6.2.108**, mise en place à la suite de la vulnérabilité de sécurité découverte dans les versions précédentes.
+
+La version HTML dépend actuellement du CDN `cdnjs.cloudflare.com` pour charger PDF.js.
+
+Une **version locale/autonome** est prévue ultérieurement. Elle sera développée et documentée séparément afin de ne pas mélanger les deux approches dans ce dépôt.
