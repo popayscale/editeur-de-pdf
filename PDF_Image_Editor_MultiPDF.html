@@ -10,8 +10,6 @@
 
 <title>PDF Image Editor - Haute Qualité</title>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
-
 <style>
 
 /* ==========================================================
@@ -1069,6 +1067,70 @@ canvas{
 
 
 <!-- ======================================================
+     FENETRE D'AVERTISSEMENT SÉCURITÉ
+====================================================== -->
+
+<div id="securityOverlay" class="helpOverlay">
+
+    <div class="helpBox">
+
+        <div class="helpHeader">
+
+            <span>
+                ⚠️ Avant de continuer
+            </span>
+
+            <button
+                id="securityClose"
+                class="helpClose"
+                title="Fermer"
+            >
+                ×
+            </button>
+
+        </div>
+
+        <div class="helpContent">
+
+            <div class="helpWarning">
+
+                <b>Vérifiez toujours la provenance de vos fichiers.</b>
+
+                <br><br>
+
+                N'importez que des PDF et des images dont vous connaissez
+                l'origine (envoyés par une personne de confiance,
+                téléchargés depuis un site officiel, etc.).
+                Un fichier provenant d'une source inconnue ou douteuse
+                peut contenir du contenu malveillant.
+
+            </div>
+
+            <div class="helpTip">
+
+                Cet outil traite vos fichiers entièrement dans votre
+                navigateur — rien n'est envoyé à un serveur — mais cela
+                ne protège pas contre un fichier lui-même piégé.
+                La prudence reste de mise avant toute ouverture.
+
+            </div>
+
+        </div>
+
+        <div class="helpFooter">
+
+            <button id="securityAck">
+                J'ai compris, continuer
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- ======================================================
      FENETRE D'AIDE
 ====================================================== -->
 
@@ -1456,7 +1518,7 @@ canvas{
 </div>
 
 
-<script>
+<script type="module">
 
 
 /* ==========================================================
@@ -1471,10 +1533,17 @@ const RENDER_SCALE =
 
 /* ==========================================================
    PDF.JS
+   ----------------------------------------------------------
+   Version à jour (build ESM officiel — les versions >= 4
+   de pdf.js ne sont plus distribuées en script global,
+   d'où l'import ci-dessous et le passage du script en
+   type="module").
 ========================================================== */
 
+import * as pdfjsLib from "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/6.2.108/pdf.min.mjs";
+
 pdfjsLib.GlobalWorkerOptions.workerSrc =
-    "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
+    "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/6.2.108/pdf.worker.min.mjs";
 
 
 /* ==========================================================
@@ -1531,6 +1600,15 @@ const helpBtn =
 
 const helpOverlay =
     document.getElementById("helpOverlay");
+
+const securityOverlay =
+    document.getElementById("securityOverlay");
+
+const securityClose =
+    document.getElementById("securityClose");
+
+const securityAck =
+    document.getElementById("securityAck");
 
 const helpClose =
     document.getElementById("helpClose");
@@ -4874,6 +4952,118 @@ document.addEventListener(
         }
     }
 );
+
+
+/* ==========================================================
+   AVERTISSEMENT SÉCURITÉ — provenance des fichiers
+   ----------------------------------------------------------
+   1) Affiché systématiquement à l'ouverture de la page.
+   2) Une confirmation est redemandée à chaque sélection
+      de fichier (PDF ou image) ; si l'utilisateur annule,
+      le fichier n'est pas chargé (le chargement normal —
+      loadPdf / l'écouteur de imgInput — est bloqué).
+========================================================== */
+
+securityOverlay.classList.add(
+    "active"
+);
+
+
+securityClose.addEventListener(
+    "click",
+    function(){
+
+        securityOverlay.classList.remove(
+            "active"
+        );
+    }
+);
+
+
+securityAck.addEventListener(
+    "click",
+    function(){
+
+        securityOverlay.classList.remove(
+            "active"
+        );
+    }
+);
+
+
+securityOverlay.addEventListener(
+    "click",
+    function(e){
+
+        if(
+            e.target === securityOverlay
+        ){
+
+            securityOverlay.classList.remove(
+                "active"
+            );
+        }
+    }
+);
+
+
+const SECURITY_CONFIRM_MESSAGE =
+    "Vérifiez la provenance de ce fichier avant de continuer.\n" +
+    "N'importez que des PDF ou images provenant d'une source fiable et connue.\n\n" +
+    "Continuer l'import ?";
+
+
+function guardFileInput(
+    inputElement
+){
+
+    /*
+        Écouteur posé en phase de CAPTURE afin de
+        s'exécuter avant les écouteurs "change" déjà
+        attachés plus haut (loadPdf, gestion imgInput).
+
+        Si l'utilisateur annule la confirmation, on stoppe
+        immédiatement la propagation : les écouteurs de
+        chargement ne s'exécutent pas et le champ est vidé.
+    */
+
+    inputElement.addEventListener(
+        "change",
+        function(e){
+
+            if(
+                !e.target.files ||
+                e.target.files.length === 0
+            ){
+
+                return;
+            }
+
+
+            const proceed =
+                window.confirm(
+                    SECURITY_CONFIRM_MESSAGE
+                );
+
+
+            if(!proceed){
+
+                e.stopImmediatePropagation();
+
+                e.preventDefault();
+
+                inputElement.value =
+                    "";
+            }
+        },
+        true
+    );
+}
+
+
+guardFileInput(pdfInput);
+
+guardFileInput(imgInput);
 
 
 /* ==========================================================
