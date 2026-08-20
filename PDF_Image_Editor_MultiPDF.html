@@ -4990,17 +4990,16 @@ printBtn.addEventListener(
 
 async function printAllPages(){
 
-    if(
-        !pdfDocument ||
-        pageCanvases.length === 0
-    ){
+if(
+    pageCanvases.length === 0
+){
 
-        alert(
-            "Aucun PDF chargé."
-        );
+    alert(
+        "Aucune page disponible."
+    );
 
-        return;
-    }
+    return;
+}
 
 
     /*
