@@ -154,6 +154,7 @@ button:disabled{
 }
 
 
+
 #helpBtn{
 
     background:#f5f5f5;
@@ -230,6 +231,17 @@ button:disabled{
 #duplicatePageBtn:hover{
 
     background:#0b5d0b;
+}
+
+
+#mergeAllBtn{
+    background:#ff8c00;
+    color:white;
+    border-color:#ff8c00;
+}
+
+#mergeAllBtn:hover{
+    background:#e67600;
 }
 
 #duplicatePageBtn:disabled{
@@ -1045,6 +1057,13 @@ canvas{
         📄➡ Copier vers l'onglet
     </button>
 
+    <!-- MERGEALL -->
+
+    <button id="mergeAllBtn">
+                     🔶 Merge All
+          </button>
+
+
     <!-- AIDE -->
 
     <button id="helpBtn">
@@ -1624,6 +1643,9 @@ const copyTargetSelect =
 
 const copyPageBtn =
     document.getElementById("copyPageBtn");
+
+const   mergeAllBtn =
+           document.getElementById("mergeAllBtn") ;
 
 
 /* ==========================================================
@@ -3081,6 +3103,179 @@ async function copyPagesToDocument(){
     selectedPages.clear();
     updateCopyControls();
 }
+
+/* ==========================================================
+   MERGE ALL DOCUMENTS
+========================================================== */
+
+mergeAllBtn.addEventListener(
+    "click",
+    mergeAllDocuments
+);
+
+async function mergeAllDocuments(){
+
+    if(documents.length < 2){
+
+        alert(
+            "Ouvrez au moins deux PDF."
+        );
+
+        return;
+    }
+
+    if(currentBox){
+
+        currentBox.remove();
+
+        currentBox = null;
+    }
+
+    const mergedDoc = {
+
+        name: "Fusion PDF",
+
+        pdfDocument: null,
+
+        pageCanvases: [],
+
+        pageInfos: [],
+
+        fixedImages: [],
+
+        pageSources: [],
+
+        pageDivs: [],
+
+        pageRotations: [],
+
+        currentPage: 0,
+
+        selectedPages: new Set()
+    };
+
+    for(const sourceDoc of documents){
+
+        for(
+            let i = 0;
+            i < sourceDoc.pageCanvases.length;
+            i++
+        ){
+
+            const sourceCanvas =
+                sourceDoc.pageCanvases[i];
+
+            const sourcePageDiv =
+                sourceDoc.pageDivs[i];
+
+            const newCanvas =
+                document.createElement(
+                    "canvas"
+                );
+
+            newCanvas.width =
+                sourceCanvas.width;
+
+            newCanvas.height =
+                sourceCanvas.height;
+
+            newCanvas.style.width =
+                sourceCanvas.style.width;
+
+            newCanvas.style.height =
+                sourceCanvas.style.height;
+
+            const ctx =
+                newCanvas.getContext(
+                    "2d"
+                );
+
+            ctx.drawImage(
+                sourceCanvas,
+                0,
+                0
+            );
+
+            const newPageDiv =
+                document.createElement(
+                    "div"
+                );
+
+            newPageDiv.className =
+                "page";
+
+            newPageDiv.style.aspectRatio =
+                sourcePageDiv.style.aspectRatio;
+
+            const newWrap =
+                document.createElement(
+                    "div"
+                );
+
+            newWrap.className =
+                "canvasWrap";
+
+            newWrap.appendChild(
+                newCanvas
+            );
+
+            newPageDiv.appendChild(
+                newWrap
+            );
+
+            mergedDoc.pageCanvases.push(
+                newCanvas
+            );
+
+            mergedDoc.pageInfos.push(
+                Object.assign(
+                    {},
+                    sourceDoc.pageInfos[i]
+                )
+            );
+
+            mergedDoc.fixedImages.push(
+                (
+                    sourceDoc.fixedImages[i] || []
+                ).map(
+                    item =>
+                        Object.assign(
+                            {},
+                            item
+                        )
+                )
+            );
+
+            mergedDoc.pageSources.push(
+                sourceDoc.pageSources[i]
+            );
+
+            mergedDoc.pageDivs.push(
+                newPageDiv
+            );
+
+            mergedDoc.pageRotations.push(
+                sourceDoc.pageRotations[i] || 0
+            );
+        }
+    }
+
+    documents.push(
+        mergedDoc
+    );
+
+    rebuildDocumentTabs();
+
+    await switchDocument(
+        documents.length - 1
+    );
+
+    info.textContent =
+        "Fusion terminée : " +
+        mergedDoc.pageCanvases.length +
+        " pages.";
+}
+
 /* ==========================================================
    CHARGEMENT PDF
 ========================================================== */
