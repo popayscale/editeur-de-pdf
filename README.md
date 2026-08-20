@@ -394,6 +394,8 @@ editeur-pdf-windows.zip
 * fonctionnement hors ligne ;
 * PDF.js fourni directement avec l'application ;
 * aucune dépendance au CDN ;
+
+!!! Attention imprimer vers pdf fonctionne mais utiliser microsoft print pdf semble ajotuer une page blanche supplémentaire je travaille dessus !!!!
 * petit serveur Python local nécessaire au fonctionnement du navigateur ;
 * aucune donnée destinée à être envoyée vers Internet.
 
