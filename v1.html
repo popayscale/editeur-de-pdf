@@ -1,0 +1,5271 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+
+<meta charset="utf-8">
+
+<meta name="viewport"
+      content="width=device-width, initial-scale=1">
+
+<title>PDF Image Editor - Haute Qualité</title>
+
+<style>
+
+/* ==========================================================
+   GENERAL
+========================================================== */
+
+*{
+    box-sizing:border-box;
+}
+
+html,
+body{
+    width:100%;
+    max-width:100%;
+    margin:0;
+    padding:0;
+    overflow-x:hidden;
+}
+
+body{
+    font-family:
+        "Segoe UI",
+        Arial,
+        sans-serif;
+
+    background:#ececec;
+    color:#222;
+}
+
+
+/* ==========================================================
+   HEADER
+========================================================== */
+
+header{
+    background:#0078d7;
+    color:white;
+    padding:15px 20px;
+    font-size:22px;
+    font-weight:600;
+}
+
+
+/* ==========================================================
+   TOOLBAR
+========================================================== */
+
+.toolbar{
+    background:white;
+
+    padding:12px;
+
+    display:flex;
+    flex-wrap:wrap;
+
+    gap:10px;
+
+    align-items:center;
+
+    border-bottom:1px solid #ccc;
+
+    position:sticky;
+
+    top:0;
+
+    z-index:1000;
+}
+
+.toolbar input[type="file"]{
+    max-width:240px;
+    min-width:0;
+}
+
+button{
+
+    border:1px solid #aaa;
+
+    background:#fff;
+
+    padding:8px 14px;
+
+    cursor:pointer;
+
+    border-radius:4px;
+
+    font-size:14px;
+}
+
+button:hover{
+    background:#f0f0f0;
+}
+
+button:disabled{
+    opacity:.6;
+    cursor:wait;
+}
+
+
+/* ==========================================================
+   BOUTONS
+========================================================== */
+
+#fixBtn{
+
+    background:#107c10;
+
+    color:white;
+
+    border-color:#107c10;
+}
+
+#fixBtn:hover{
+    background:#0b650b;
+}
+
+
+#deleteBtn{
+
+    background:#d83b01;
+
+    color:white;
+
+    border-color:#d83b01;
+}
+
+#deleteBtn:hover{
+    background:#b52f00;
+}
+
+
+#printBtn{
+
+    background:#0078d7;
+
+    color:white;
+
+    border-color:#0078d7;
+}
+
+#printBtn:hover{
+    background:#0067b8;
+}
+
+
+
+#helpBtn{
+
+    background:#f5f5f5;
+
+    color:#333;
+
+    border-color:#aaa;
+}
+
+#helpBtn:hover{
+    background:#e5e5e5;
+}
+
+
+#moveLeftBtn,
+#moveRightBtn{
+
+    background:#5c2d91;
+
+    color:white;
+
+    border-color:#5c2d91;
+}
+
+#moveLeftBtn:hover,
+#moveRightBtn:hover{
+
+    background:#4b2578;
+}
+
+#moveLeftBtn:disabled,
+#moveRightBtn:disabled{
+
+    opacity:.4;
+
+    cursor:not-allowed;
+}
+
+
+#rotateLeftBtn,
+#rotateRightBtn{
+
+    background:#0078d7;
+
+    color:white;
+
+    border-color:#0078d7;
+}
+
+#rotateLeftBtn:hover,
+#rotateRightBtn:hover{
+
+    background:#005fa8;
+}
+
+#rotateLeftBtn:disabled,
+#rotateRightBtn:disabled{
+
+    opacity:.4;
+
+    cursor:not-allowed;
+}
+
+
+#duplicatePageBtn{
+
+    background:#107c10;
+
+    color:white;
+
+    border-color:#107c10;
+}
+
+#duplicatePageBtn:hover{
+
+    background:#0b5d0b;
+}
+
+
+#mergeAllBtn{
+    background:#ff8c00;
+    color:white;
+    border-color:#ff8c00;
+}
+
+#mergeAllBtn:hover{
+    background:#e67600;
+}
+
+#duplicatePageBtn:disabled{
+
+    opacity:.4;
+
+    cursor:not-allowed;
+}
+
+
+#deletePageBtn{
+
+    background:#a4262c;
+
+    color:white;
+
+    border-color:#a4262c;
+}
+
+#deletePageBtn:hover{
+
+    background:#84151a;
+}
+
+#deletePageBtn:disabled{
+
+    opacity:.4;
+
+    cursor:not-allowed;
+}
+
+
+/* ==========================================================
+   INFO
+========================================================== */
+
+.info{
+
+    padding:8px 12px;
+
+    background:#fff;
+
+    border-bottom:1px solid #ddd;
+
+    font-size:13px;
+
+    color:#555;
+}
+
+
+/* ==========================================================
+   ONGLETS DOCUMENTS + PAGES
+========================================================== */
+
+.tabs,
+.docTabs{
+
+    display:flex;
+
+    gap:5px;
+
+    padding:10px;
+
+    overflow-x:auto;
+
+    background:#f5f5f5;
+
+    border-bottom:1px solid #ccc;
+
+    -webkit-overflow-scrolling:touch;
+}
+
+.docTabs{
+    background:#e9eef3;
+    padding-bottom:7px;
+}
+
+.pageTabs{
+    display:flex;
+    gap:5px;
+    padding:8px 10px;
+    overflow-x:auto;
+    background:#f5f5f5;
+    border-bottom:1px solid #ccc;
+    -webkit-overflow-scrolling:touch;
+}
+
+.tab,
+.docTab{
+
+    flex-shrink:0;
+
+    padding:8px 15px;
+
+    border:1px solid #aaa;
+
+    background:white;
+
+    cursor:pointer;
+}
+
+.docTab{
+    font-weight:600;
+}
+
+.tab.active,
+.docTab.active{
+
+    background:#0078d7;
+
+    color:white;
+
+    border-color:#0078d7;
+}
+
+.tab.selected{
+    outline:3px solid #f59e0b;
+    outline-offset:-3px;
+    background:#fff3cd;
+    color:#222;
+}
+
+.docTab.active.selected{
+    background:#0078d7;
+    color:white;
+}
+
+
+/* ==========================================================
+   PAGES
+========================================================== */
+
+#pages{
+
+    width:100%;
+
+    max-width:100%;
+}
+
+.page{
+
+    display:none;
+
+    padding:20px;
+
+    width:100%;
+}
+
+.page.active{
+
+    display:block;
+}
+
+
+/* ==========================================================
+   CANVAS
+========================================================== */
+
+.canvasWrap{
+
+    position:relative;
+
+    width:max-content;
+
+    max-width:100%;
+
+    margin:auto;
+
+    line-height:0;
+}
+
+canvas{
+
+    display:block;
+
+    background:white;
+
+    box-shadow:
+        0 0 10px rgba(0,0,0,.25);
+
+    max-width:100%;
+
+    height:auto;
+}
+
+
+/* ==========================================================
+   IMAGE TEMPORAIRE
+========================================================== */
+
+.imageBox{
+
+    position:absolute;
+
+    left:20px;
+
+    top:20px;
+
+    width:200px;
+
+    height:200px;
+
+    border:2px solid #0078d7;
+
+    background:white;
+
+    overflow:hidden;
+
+    cursor:move;
+
+    line-height:normal;
+
+    box-sizing:border-box;
+
+    user-select:none;
+
+    z-index:20;
+
+    touch-action:none;
+}
+
+.imageBox img{
+
+    display:block;
+
+    width:100%;
+
+    height:100%;
+
+    /*
+        IMPORTANT :
+
+        L'image reste entièrement visible
+        et garde son ratio.
+    */
+
+    object-fit:contain;
+
+    pointer-events:none;
+
+    user-select:none;
+}
+
+
+/* ==========================================================
+   POIGNEE REDIMENSIONNEMENT
+========================================================== */
+
+.resize{
+
+    position:absolute;
+
+    width:20px;
+
+    height:20px;
+
+    right:-1px;
+
+    bottom:-1px;
+
+    background:#0078d7;
+
+    cursor:nwse-resize;
+
+    touch-action:none;
+
+    z-index:30;
+}
+
+
+/* ==========================================================
+   AIDE
+========================================================== */
+
+.helpOverlay{
+
+    display:none;
+
+    position:fixed;
+
+    inset:0;
+
+    background:rgba(0,0,0,.5);
+
+    z-index:5000;
+
+    align-items:center;
+
+    justify-content:center;
+
+    padding:20px;
+}
+
+.helpOverlay.active{
+
+    display:flex;
+}
+
+.helpBox{
+
+    width:100%;
+
+    max-width:600px;
+
+    max-height:90vh;
+
+    overflow:auto;
+
+    background:white;
+
+    border-radius:10px;
+
+    box-shadow:
+        0 10px 40px rgba(0,0,0,.3);
+
+    overflow-x:hidden;
+}
+
+.helpHeader{
+
+    background:#0078d7;
+
+    color:white;
+
+    padding:16px 20px;
+
+    font-size:20px;
+
+    font-weight:600;
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+}
+
+.helpClose{
+
+    background:transparent;
+
+    border:0;
+
+    color:white;
+
+    font-size:24px;
+
+    padding:0 5px;
+
+    cursor:pointer;
+}
+
+.helpClose:hover{
+
+    background:rgba(255,255,255,.15);
+}
+
+.helpContent{
+
+    padding:20px;
+
+    line-height:1.6;
+
+    color:#333;
+}
+
+.helpStep{
+
+    display:flex;
+
+    gap:15px;
+
+    margin-bottom:20px;
+}
+
+.helpNumber{
+
+    flex-shrink:0;
+
+    width:35px;
+
+    height:35px;
+
+    border-radius:50%;
+
+    background:#0078d7;
+
+    color:white;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    font-weight:bold;
+}
+
+.helpStep strong{
+
+    color:#0078d7;
+}
+
+.helpTip{
+
+    background:#f3f8fc;
+
+    border-left:4px solid #0078d7;
+
+    padding:10px 14px;
+
+    margin-top:10px;
+}
+
+.helpWarning{
+
+    background:#fff4ce;
+
+    border-left:4px solid #ffb900;
+
+    padding:10px 14px;
+
+    margin-top:10px;
+}
+
+.helpFooter{
+
+    padding:12px 20px;
+
+    background:#f5f5f5;
+
+    text-align:right;
+
+    border-top:1px solid #ddd;
+}
+
+
+/* ==========================================================
+   IMPRESSION
+========================================================== */
+
+@media print{
+
+    @page{
+        margin:0;
+    }
+
+    html,
+    body{
+
+        margin:0;
+
+        padding:0;
+
+        background:white;
+    }
+
+    header,
+    .toolbar,
+    .tabs,
+    .docTabs,
+    .pageTabs,
+    .info{
+
+        display:none !important;
+    }
+
+    #pages{
+
+        margin:0;
+
+        padding:0;
+    }
+
+    .page{
+
+        display:block !important;
+
+        margin:0 !important;
+
+        padding:0 !important;
+
+        width:100% !important;
+
+        page-break-after:always;
+
+        break-after:page;
+
+        overflow:hidden;
+    }
+
+    .page:last-child{
+
+        page-break-after:auto;
+
+        break-after:auto;
+    }
+
+    .canvasWrap{
+
+        margin:0 !important;
+
+        padding:0 !important;
+
+        width:100% !important;
+
+        max-width:none !important;
+    }
+
+    canvas{
+
+        display:block;
+
+        width:100% !important;
+
+        height:auto !important;
+
+        max-width:none !important;
+
+        box-shadow:none !important;
+    }
+
+    .imageBox{
+
+        display:none !important;
+    }
+}
+
+
+/* ==========================================================
+   MOBILE / TABLETTE
+========================================================== */
+
+@media (max-width:700px){
+
+    header{
+
+        padding:12px 14px;
+
+        font-size:18px;
+    }
+
+    .toolbar{
+
+        position:sticky;
+
+        top:0;
+
+        padding:8px;
+
+        gap:7px;
+
+        align-items:stretch;
+    }
+
+    .toolbar input[type="file"]{
+
+        width:100%;
+
+        flex:1 1 100%;
+
+        max-width:100%;
+
+        font-size:13px;
+    }
+
+    .toolbar button{
+
+        flex:1 1 calc(50% - 7px);
+
+        min-height:42px;
+
+        padding:9px 8px;
+
+        font-size:13px;
+    }
+
+    .info{
+
+        padding:7px 9px;
+
+        font-size:12px;
+    }
+
+    .tabs,
+    .docTabs,
+    .pageTabs{
+
+        padding:7px;
+
+        gap:4px;
+    }
+
+    .tab,
+    .docTab{
+
+        min-height:40px;
+
+        padding:8px 12px;
+    }
+
+    .page{
+
+        padding:8px 0;
+    }
+
+    .canvasWrap{
+
+        width:100%;
+
+        max-width:100%;
+
+        margin:0 auto;
+    }
+
+    canvas{
+
+        width:100% !important;
+
+        max-width:100%;
+
+        height:auto !important;
+    }
+
+    .resize{
+
+        width:28px;
+
+        height:28px;
+
+        right:-1px;
+
+        bottom:-1px;
+    }
+
+    .helpOverlay{
+
+        padding:8px;
+    }
+
+    .helpBox{
+
+        max-height:94vh;
+
+        border-radius:8px;
+    }
+
+    .helpHeader{
+
+        padding:12px 14px;
+
+        font-size:18px;
+    }
+
+    .helpContent{
+
+        padding:14px;
+    }
+
+    .helpStep{
+
+        gap:10px;
+
+        margin-bottom:16px;
+    }
+
+    .helpNumber{
+
+        width:30px;
+
+        height:30px;
+    }
+}
+
+
+@media (max-width:420px){
+
+    .toolbar button{
+
+        flex:1 1 100%;
+    }
+
+    .page{
+
+        padding:4px 0;
+    }
+
+    .info{
+
+        font-size:11px;
+    }
+
+    .helpStep{
+
+        display:block;
+    }
+
+    .helpNumber{
+
+        margin-bottom:7px;
+    }
+}
+
+</style>
+
+</head>
+
+
+<body>
+
+
+<header>
+    PDF Image Editor — Haute Qualité
+</header>
+
+
+<div class="toolbar">
+
+    <!-- PDF -->
+
+    <input
+        type="file"
+        id="pdfInput"
+        accept=".pdf,application/pdf"
+        multiple
+        title="Ouvrir un ou plusieurs PDF"
+    >
+
+
+    <!-- IMAGE -->
+
+    <input
+        type="file"
+        id="imgInput"
+        accept="image/*"
+    >
+
+
+    <!-- FIXER -->
+
+    <button id="fixBtn">
+        ✓ Fixer l'image
+    </button>
+
+
+    <!-- SUPPRIMER -->
+
+    <button id="deleteBtn">
+        🗑 Supprimer l'image
+    </button>
+
+
+    <!-- SUPPRIMER LA PAGE -->
+
+    <button id="deletePageBtn" title="Supprimer la page active">
+        🗑📄 Supprimer la page
+    </button>
+
+
+    <!-- DEPLACER GAUCHE -->
+
+    <button id="moveLeftBtn" title="Déplacer cette page vers la gauche">
+        ⬅ Déplacer
+    </button>
+
+
+    <!-- DEPLACER DROITE -->
+
+    <button id="moveRightBtn" title="Déplacer cette page vers la droite">
+        Déplacer ➡
+    </button>
+
+
+    <!-- DUPLIQUER EN DERNIERE POSITION -->
+
+    <button id="duplicatePageBtn" title="Copier cette page en dernière position">
+        📄+ Copier en dernier
+    </button>
+
+
+    <!-- PIVOTER GAUCHE -->
+
+    <button id="rotateLeftBtn" title="Faire pivoter cette page vers la gauche">
+        ⟲ Pivoter
+    </button>
+
+
+    <!-- PIVOTER DROITE -->
+
+    <button id="rotateRightBtn" title="Faire pivoter cette page vers la droite">
+        Pivoter ⟳
+    </button>
+
+
+    <!-- IMPRIMER -->
+
+    <button id="printBtn">
+        🖨 Imprimer toutes les pages
+    </button>
+
+
+    <!-- COPIE ENTRE DOCUMENTS -->
+
+    <button id="selectPagesBtn" title="Activer la sélection de plusieurs pages">
+        ☑ Sélectionner
+    </button>
+
+    <select id="copyTargetSelect" title="Document PDF cible" disabled>
+        <option value="">Copier vers…</option>
+    </select>
+
+    <button id="copyPageBtn" title="Copier la page active ou les pages sélectionnées" disabled>
+        📄➡ Copier vers l'onglet
+    </button>
+
+    <!-- MERGEALL -->
+
+    <button id="mergeAllBtn">
+                     🔶 Merge All
+          </button>
+
+
+    <!-- AIDE -->
+
+    <button id="helpBtn">
+        ❓ Aide
+    </button>
+
+</div>
+
+
+<div class="info" id="info">
+    Chargez un PDF pour commencer.
+</div>
+
+
+<div id="docTabs" class="docTabs"></div>
+
+<div id="pageTabs" class="pageTabs"></div>
+
+<div id="pages"></div>
+
+
+<!-- ======================================================
+     FENETRE D'AVERTISSEMENT SÉCURITÉ
+====================================================== -->
+
+<div id="securityOverlay" class="helpOverlay">
+
+    <div class="helpBox">
+
+        <div class="helpHeader">
+
+            <span>
+                ⚠️ Avant de continuer
+            </span>
+
+            <button
+                id="securityClose"
+                class="helpClose"
+                title="Fermer"
+            >
+                ×
+            </button>
+
+        </div>
+
+        <div class="helpContent">
+
+            <div class="helpWarning">
+
+                <b>Vérifiez toujours la provenance de vos fichiers.</b>
+
+                <br><br>
+
+                N'importez que des PDF et des images dont vous connaissez
+                l'origine (envoyés par une personne de confiance,
+                téléchargés depuis un site officiel, etc.).
+                Un fichier provenant d'une source inconnue ou douteuse
+                peut contenir du contenu malveillant.
+
+            </div>
+
+            <div class="helpTip">
+
+                Cet outil traite vos fichiers entièrement dans votre
+                navigateur — rien n'est envoyé à un serveur — mais cela
+                ne protège pas contre un fichier lui-même piégé.
+                La prudence reste de mise avant toute ouverture.
+
+            </div>
+
+        </div>
+
+        <div class="helpFooter">
+
+            <button id="securityAck">
+                J'ai compris, continuer
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- ======================================================
+     FENETRE D'AIDE
+====================================================== -->
+
+<div id="helpOverlay" class="helpOverlay">
+
+    <div class="helpBox">
+
+
+        <div class="helpHeader">
+
+            <span>
+                ❓ Comment utiliser l'outil ?
+            </span>
+
+            <button
+                id="helpClose"
+                class="helpClose"
+                title="Fermer"
+            >
+                ×
+            </button>
+
+        </div>
+
+
+        <div class="helpContent">
+
+
+            <!-- ETAPE 1 -->
+
+            <div class="helpStep">
+
+                <div class="helpNumber">
+                    1
+                </div>
+
+                <div>
+
+                    <strong>
+                        Importer le PDF
+                    </strong>
+
+                    <br>
+
+                    Cliquez sur
+                    <b>Choisir un fichier</b>
+                    et sélectionnez un ou plusieurs PDF.
+
+                    <br><br>
+
+                    Chaque PDF ouvert devient un
+                    <b>onglet de document</b> distinct
+                    (Onglet 1, Onglet 2, etc.) et ses pages
+                    apparaissent juste en dessous.
+
+                    <br><br>
+
+                    Vous pouvez rouvrir le sélecteur de fichiers
+                    à tout moment pour ajouter d'autres PDF
+                    sans fermer les précédents.
+
+                </div>
+
+            </div>
+
+
+            <!-- ETAPE 2 -->
+
+            <div class="helpStep">
+
+                <div class="helpNumber">
+                    2
+                </div>
+
+                <div>
+
+                    <strong>
+                        Copier une page vers un autre PDF
+                    </strong>
+
+                    <br>
+
+                    Sélectionnez d'abord l'onglet du PDF
+                    contenant la page à copier.
+
+                    <br><br>
+
+                    Cliquez sur
+                    <b>☑ Sélectionner</b> puis sur une ou plusieurs
+                    pages si vous souhaitez faire une sélection.
+
+                    <br><br>
+
+                    Choisissez ensuite le PDF cible dans
+                    <b>Copier vers…</b> et cliquez sur
+                    <b>📄➡ Copier vers l'onglet</b>.
+
+                    <br><br>
+
+                    La ou les pages sont <b>copiées</b> dans le
+                    document cible et ajoutées <b>à la fin</b>.
+                    Le document source reste inchangé.
+
+                    <div class="helpTip">
+                        <b>💡 Exemple :</b>
+                        depuis l'Onglet 3, sélectionnez la page 4,
+                        choisissez l'Onglet 2 et copiez-la :
+                        la page 4 est ajoutée en dernière position
+                        dans l'Onglet 2.
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- ETAPE 3 -->
+
+            <div class="helpStep">
+
+                <div class="helpNumber">
+                    3
+                </div>
+
+                <div>
+
+                    <strong>
+                        Ajouter une image
+                    </strong>
+
+                    <br>
+
+                    Sélectionnez une image avec
+                    <b>Choisir un fichier</b>.
+
+                    <br><br>
+
+                    L'image apparaît sur la page active.
+
+                    <br><br>
+
+                    👉 Faites glisser l'image
+                    avec la souris pour la déplacer.
+
+                    <br>
+
+                    👉 Utilisez le carré bleu
+                    en bas à droite pour la redimensionner.
+
+                </div>
+
+            </div>
+
+
+            <!-- ETAPE 3 -->
+
+            <div class="helpStep">
+
+                <div class="helpNumber">
+                    4
+                </div>
+
+                <div>
+
+                    <strong>
+                        Fixer l'image
+                    </strong>
+
+                    <br>
+
+                    Lorsque l'image est correctement
+                    positionnée, cliquez sur :
+
+                    <br><br>
+
+                    <b>✓ Fixer l'image</b>
+
+                    <br><br>
+
+                    L'image est alors intégrée
+                    définitivement à la page.
+
+                </div>
+
+            </div>
+
+
+            <!-- ETAPE 4 -->
+
+            <div class="helpStep">
+
+                <div class="helpNumber">
+                    5
+                </div>
+
+                <div>
+
+                    <strong>
+                        Supprimer une image
+                    </strong>
+
+                    <br>
+
+                    Cliquez sur :
+
+                    <br><br>
+
+                    <b>🗑 Supprimer l'image</b>
+
+                    <br><br>
+
+                    Si une image est encore en cours
+                    de déplacement, elle sera supprimée.
+
+                    <br><br>
+
+                    Si aucune image n'est en cours
+                    de modification, la dernière image
+                    fixée sur la page active sera supprimée.
+
+                </div>
+
+            </div>
+
+
+            <!-- ETAPE 5 -->
+
+            <div class="helpStep">
+
+                <div class="helpNumber">
+                    6
+                </div>
+
+                <div>
+
+                    <strong>
+                        Réorganiser les pages
+                    </strong>
+
+                    <br>
+
+                    Utilisez les boutons :
+
+                    <br><br>
+
+                    <b>⬅ Déplacer</b> et <b>Déplacer ➡</b>
+
+                    <br><br>
+
+                    pour échanger la page active
+                    avec sa voisine immédiate.
+
+                    <br><br>
+
+                    Les images déjà fixées sur chaque page
+                    se déplacent avec elle. Les onglets
+                    gardent toujours leur numéro de position
+                    (Page 1, Page 2, ...), seul le contenu bouge.
+
+                </div>
+
+            </div>
+
+
+            <!-- ETAPE 6 -->
+
+            <div class="helpStep">
+
+                <div class="helpNumber">
+                    7
+                </div>
+
+                <div>
+
+                    <strong>
+                        Supprimer une page entière
+                    </strong>
+
+                    <br>
+
+                    Cliquez sur :
+
+                    <br><br>
+
+                    <b>🗑📄 Supprimer la page</b>
+
+                    <br><br>
+
+                    La page active (avec toutes ses images
+                    fixées) est retirée définitivement du
+                    document. Une confirmation est demandée
+                    avant la suppression.
+
+                    <br><br>
+
+                    Les onglets restants sont automatiquement
+                    renumérotés (Page 1, Page 2, ...).
+
+                    <br><br>
+
+                    ⚠️ Il est impossible de supprimer une page
+                    s'il ne reste qu'une seule page dans le
+                    document : le document ne peut pas rester
+                    vide.
+
+                </div>
+
+            </div>
+
+
+            <!-- ETAPE 7 -->
+
+            <div class="helpStep">
+
+                <div class="helpNumber">
+                    8
+                </div>
+
+                <div>
+
+                    <strong>
+                        Imprimer
+                    </strong>
+
+                    <br>
+
+                    Une fois toutes les images
+                    correctement placées et fixées,
+                    cliquez sur :
+
+                    <br><br>
+
+                    <b>🖨 Imprimer toutes les pages</b>
+
+                    <br><br>
+
+                    Toutes les pages seront envoyées
+                    à l'impression.
+
+                </div>
+
+            </div>
+
+
+            <div class="helpTip">
+
+                <b>💡 Astuce :</b>
+
+                Pour ajouter une image sur une autre page,
+                sélectionnez d'abord l'onglet de cette page,
+                puis importez votre image.
+
+            </div>
+
+
+            <div class="helpWarning">
+
+                <b>⚠️ Important :</b>
+
+                Une image doit être fixée avant
+                l'impression.
+
+                <br><br>
+
+                Si une image n'est pas fixée au moment
+                de l'impression, l'outil vous demandera
+                si vous souhaitez la fixer.
+
+            </div>
+
+
+        </div>
+
+
+        <div class="helpFooter">
+
+            <button id="helpCloseBottom">
+                Fermer
+            </button>
+
+        </div>
+
+
+    </div>
+
+</div>
+
+
+<script type="module">
+
+
+/* ==========================================================
+   CONFIGURATION
+========================================================== */
+
+const RENDER_DPI = 300;
+
+const RENDER_SCALE =
+    RENDER_DPI / 72;
+
+
+/* ==========================================================
+   PDF.JS
+   ----------------------------------------------------------
+   Version à jour (build ESM officiel — les versions >= 4
+   de pdf.js ne sont plus distribuées en script global,
+   d'où l'import ci-dessous et le passage du script en
+   type="module").
+========================================================== */
+
+import * as pdfjsLib from "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/6.2.108/pdf.min.mjs";
+
+pdfjsLib.GlobalWorkerOptions.workerSrc =
+    "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/6.2.108/pdf.worker.min.mjs";
+
+
+/* ==========================================================
+   ELEMENTS
+========================================================== */
+
+const docTabs =
+    document.getElementById("docTabs");
+
+const pageTabs =
+    document.getElementById("pageTabs");
+
+const pages =
+    document.getElementById("pages");
+
+const info =
+    document.getElementById("info");
+
+const pdfInput =
+    document.getElementById("pdfInput");
+
+const imgInput =
+    document.getElementById("imgInput");
+
+const fixBtn =
+    document.getElementById("fixBtn");
+
+const deleteBtn =
+    document.getElementById("deleteBtn");
+
+const deletePageBtn =
+    document.getElementById("deletePageBtn");
+
+const moveLeftBtn =
+    document.getElementById("moveLeftBtn");
+
+const moveRightBtn =
+    document.getElementById("moveRightBtn");
+
+const rotateLeftBtn =
+    document.getElementById("rotateLeftBtn");
+
+const rotateRightBtn =
+    document.getElementById("rotateRightBtn");
+
+const duplicatePageBtn =
+    document.getElementById("duplicatePageBtn");
+
+const printBtn =
+    document.getElementById("printBtn");
+
+const helpBtn =
+    document.getElementById("helpBtn");
+
+const helpOverlay =
+    document.getElementById("helpOverlay");
+
+const securityOverlay =
+    document.getElementById("securityOverlay");
+
+const securityClose =
+    document.getElementById("securityClose");
+
+const securityAck =
+    document.getElementById("securityAck");
+
+const helpClose =
+    document.getElementById("helpClose");
+
+const helpCloseBottom =
+    document.getElementById("helpCloseBottom");
+
+const selectPagesBtn =
+    document.getElementById("selectPagesBtn");
+
+const copyTargetSelect =
+    document.getElementById("copyTargetSelect");
+
+const copyPageBtn =
+    document.getElementById("copyPageBtn");
+
+const   mergeAllBtn =
+           document.getElementById("mergeAllBtn") ;
+
+
+/* ==========================================================
+   VARIABLES
+========================================================== */
+
+let currentPage = 0;
+
+let currentBox = null;
+
+/*
+    Chaque PDF ouvert possède son propre état.
+    Le document actif utilise les variables ci-dessous comme
+    références vers les tableaux du document sélectionné.
+*/
+
+let documents = [];
+
+let activeDocumentIndex = -1;
+
+let pageCanvases = [];
+
+let pageInfos = [];
+
+let fixedImages = [];
+
+let pageSources = [];
+
+let pageDivs = [];
+
+let pageRotations = [];
+
+let selectedPages = new Set();
+
+let selectionMode = false;
+
+/*
+    PDF.js original du document actif.
+    Les pages copiées conservent leur PDF source dans pageSources,
+    ce qui permet ensuite de les reconstruire correctement.
+*/
+
+let pdfDocument = null;
+
+
+/* ==========================================================
+   UTILITAIRES
+========================================================== */
+
+function getActiveWrap(){
+
+    const wraps =
+        document.querySelectorAll(
+            ".canvasWrap"
+        );
+
+    return wraps[currentPage] || null;
+}
+
+
+function getActiveCanvas(){
+
+    return pageCanvases[currentPage] || null;
+}
+
+
+function clamp(
+    value,
+    min,
+    max
+){
+
+    return Math.min(
+        Math.max(value, min),
+        max
+    );
+}
+
+function getActiveDocument(){
+    return documents[activeDocumentIndex] || null;
+}
+
+function syncActiveState(){
+    const doc = getActiveDocument();
+
+    if(!doc){
+        pdfDocument = null;
+        pageCanvases = [];
+        pageInfos = [];
+        fixedImages = [];
+        pageSources = [];
+        pageDivs = [];
+        pageRotations = [];
+        selectedPages = new Set();
+        currentPage = 0;
+        return;
+    }
+
+    pdfDocument = doc.pdfDocument;
+    pageCanvases = doc.pageCanvases;
+    pageInfos = doc.pageInfos;
+    fixedImages = doc.fixedImages;
+    pageSources = doc.pageSources;
+    pageDivs = doc.pageDivs;
+    pageRotations = doc.pageRotations || [];
+    selectedPages = doc.selectedPages;
+
+    currentPage = Math.min(
+        doc.currentPage || 0,
+        Math.max(0, pageCanvases.length - 1)
+    );
+}
+
+function saveActiveState(){
+    const doc = getActiveDocument();
+    if(!doc) return;
+
+    doc.pdfDocument = pdfDocument;
+    doc.pageCanvases = pageCanvases;
+    doc.pageInfos = pageInfos;
+    doc.fixedImages = fixedImages;
+    doc.pageSources = pageSources;
+    doc.pageDivs = pageDivs;
+    doc.pageRotations = pageRotations;
+    doc.currentPage = currentPage;
+    doc.selectedPages = selectedPages;
+}
+
+function updateCopyControls(){
+    const hasMultiple = documents.length >= 2;
+    const hasPages = !!pdfDocument && pageCanvases.length > 0;
+    const hasSelection = selectedPages.size > 0;
+
+    selectPagesBtn.disabled = !hasPages;
+    selectPagesBtn.textContent =
+        selectionMode ? "☑ Sélection active" : "☑ Sélectionner";
+
+    copyTargetSelect.disabled = !hasMultiple || !hasPages;
+
+    const previousTarget =
+        copyTargetSelect.value;
+
+    copyTargetSelect.innerHTML = '<option value="">Copier vers…</option>';
+
+    documents.forEach((doc, index) => {
+        if(index === activeDocumentIndex) return;
+
+        const option = document.createElement("option");
+        option.value = index;
+        option.textContent =
+            "Onglet " + (index + 1) + " — " + doc.name;
+        copyTargetSelect.appendChild(option);
+    });
+
+    if(
+        previousTarget &&
+        parseInt(previousTarget, 10) !== activeDocumentIndex &&
+        parseInt(previousTarget, 10) >= 0 &&
+        parseInt(previousTarget, 10) < documents.length
+    ){
+        copyTargetSelect.value = previousTarget;
+    }
+
+    const targetIndex =
+        parseInt(copyTargetSelect.value, 10);
+
+    const validTarget =
+        Number.isInteger(targetIndex) &&
+        targetIndex >= 0 &&
+        targetIndex < documents.length &&
+        targetIndex !== activeDocumentIndex;
+
+    copyPageBtn.disabled =
+        !validTarget || !hasPages;
+
+    if(!hasMultiple){
+        copyPageBtn.disabled = true;
+    }
+}
+
+function updatePageSelectionVisuals(){
+    pageTabs.querySelectorAll(".tab").forEach((tab, index) => {
+        tab.classList.toggle(
+            "selected",
+            selectedPages.has(index)
+        );
+        tab.setAttribute(
+            "aria-pressed",
+            selectedPages.has(index) ? "true" : "false"
+        );
+    });
+}
+
+function togglePageSelection(index){
+    if(selectedPages.has(index)){
+        selectedPages.delete(index);
+    }else{
+        selectedPages.add(index);
+    }
+
+    saveActiveState();
+    updatePageSelectionVisuals();
+    updateCopyControls();
+
+    info.textContent =
+        selectedPages.size +
+        " page(s) sélectionnée(s).";
+}
+
+
+/* ==========================================================
+   BOUTONS DE DEPLACEMENT
+========================================================== */
+
+function updateMoveButtons(){
+
+    const total =
+        pageCanvases.length;
+
+
+    if(total < 2){
+
+        moveLeftBtn.disabled = true;
+
+        moveRightBtn.disabled = true;
+
+    }
+    else{
+
+        moveLeftBtn.disabled =
+            (currentPage <= 0);
+
+
+        moveRightBtn.disabled =
+            (currentPage >= total - 1);
+    }
+
+
+    /*
+        On ne peut jamais supprimer
+        la seule page restante du document :
+        le document ne doit pas rester vide.
+    */
+
+    deletePageBtn.disabled =
+        (total <= 1);
+
+
+    /*
+        Dupliquer et pivoter ne nécessitent
+        qu'une seule page présente.
+    */
+
+    duplicatePageBtn.disabled =
+        (total < 1);
+
+    rotateLeftBtn.disabled =
+        (total < 1);
+
+    rotateRightBtn.disabled =
+        (total < 1);
+}
+
+
+/* ==========================================================
+   ACTIVATION PAGE
+========================================================== */
+
+function activatePage(index){
+
+    if(
+        index < 0 ||
+        index >= pageCanvases.length
+    ){
+
+        return;
+    }
+
+
+    /*
+        Une image non fixée ne passe pas
+        automatiquement sur une autre page.
+    */
+
+    if(currentBox){
+
+        currentBox.remove();
+
+        currentBox = null;
+    }
+
+
+    currentPage = index;
+
+
+    pageTabs
+        .querySelectorAll(".tab")
+        .forEach(
+            (tab, i) => {
+
+                tab.classList.toggle(
+                    "active",
+                    i === index
+                );
+
+            }
+        );
+
+
+    document
+        .querySelectorAll(".page")
+        .forEach(
+            (page, i) => {
+
+                page.classList.toggle(
+                    "active",
+                    i === index
+                );
+
+            }
+        );
+
+
+    info.textContent =
+        "Page " +
+        (index + 1) +
+        " / " +
+        pageCanvases.length;
+
+
+    updateMoveButtons();
+    updatePageSelectionVisuals();
+    updateCopyControls();
+}
+
+
+/* ==========================================================
+   DEPLACEMENT D'UNE PAGE (GAUCHE / DROITE)
+==========================================================
+
+   Echange la page active avec sa voisine immédiate,
+   sans renommer les onglets (toujours "Page 1", "Page 2", ...).
+
+   Le contenu (canvas rendu + images fixées) suit le
+   déplacement ; seule la position dans le document change.
+========================================================== */
+
+moveLeftBtn.addEventListener(
+    "click",
+    function(){
+
+        movePage(-1);
+    }
+);
+
+
+moveRightBtn.addEventListener(
+    "click",
+    function(){
+
+        movePage(1);
+    }
+);
+
+
+function movePage(direction){
+
+    if(
+        !pdfDocument ||
+        pageCanvases.length < 2
+    ){
+
+        alert(
+            "Aucun PDF chargé ou une seule page disponible."
+        );
+
+        return;
+    }
+
+
+    const target =
+        currentPage + direction;
+
+
+    if(
+        target < 0 ||
+        target >= pageCanvases.length
+    ){
+
+        return;
+    }
+
+
+    /*
+        Une image non fixée ne suit pas
+        automatiquement le déplacement de la page.
+    */
+
+    if(currentBox){
+
+        const confirmation =
+            confirm(
+                "Une image n'est pas encore fixée sur cette page.\n\n" +
+                "Elle sera perdue si vous déplacez la page. Continuer ?"
+            );
+
+
+        if(!confirmation){
+
+            return;
+        }
+
+
+        currentBox.remove();
+
+        currentBox = null;
+    }
+
+
+    const low =
+        Math.min(currentPage, target);
+
+
+    const high =
+        Math.max(currentPage, target);
+
+
+    /*
+        --------------------------------------------------
+        ECHANGE DES DONNEES
+        --------------------------------------------------
+
+        Canvas rendu, informations de page et images
+        fixées voyagent ensemble.
+    */
+
+    [pageCanvases[low], pageCanvases[high]] =
+        [pageCanvases[high], pageCanvases[low]];
+
+
+    [pageInfos[low], pageInfos[high]] =
+        [pageInfos[high], pageInfos[low]];
+
+
+    [fixedImages[low], fixedImages[high]] =
+        [fixedImages[high], fixedImages[low]];
+
+    [pageSources[low], pageSources[high]] =
+        [pageSources[high], pageSources[low]];
+
+    [pageDivs[low], pageDivs[high]] =
+        [pageDivs[high], pageDivs[low]];
+
+    [pageRotations[low], pageRotations[high]] =
+        [pageRotations[high], pageRotations[low]];
+
+
+    /*
+        --------------------------------------------------
+        ECHANGE DES BLOCS .page DANS LE DOM
+        --------------------------------------------------
+
+        Les onglets ne sont PAS touchés : ils gardent
+        toujours leur libellé positionnel
+        ("Page 1", "Page 2", ...).
+    */
+
+    pages.innerHTML = "";
+
+    pageDivs.forEach(pageDiv => {
+        pages.appendChild(pageDiv);
+    });
+
+
+    /*
+        La vue suit le contenu déplacé.
+    */
+
+    activatePage(
+        target
+    );
+
+
+    info.textContent =
+        "Page déplacée en position " +
+        (target + 1) +
+        ".";
+}
+
+
+/* ==========================================================
+   ROTATION D'UNE PAGE (GAUCHE / DROITE)
+==========================================================
+
+   Fait pivoter le contenu déjà rendu de la page active
+   (rendu PDF + images fixées) de 90°, sans re-générer
+   la page depuis le PDF source.
+
+   Le canvas existant est réutilisé (mutation en place) :
+   ses dimensions, le style CSS associé, le ratio du
+   conteneur .page et les métadonnées de page (pageInfos)
+   sont mis à jour en conséquence.
+========================================================== */
+
+rotateLeftBtn.addEventListener(
+    "click",
+    function(){
+
+        rotatePage(-1);
+    }
+);
+
+
+rotateRightBtn.addEventListener(
+    "click",
+    function(){
+
+        rotatePage(1);
+    }
+);
+
+
+function rotateCanvasStepInPlace(
+    canvas,
+    clockwise
+){
+
+    const srcWidth =
+        canvas.width;
+
+    const srcHeight =
+        canvas.height;
+
+
+    const temp =
+        document.createElement("canvas");
+
+    temp.width = srcHeight;
+    temp.height = srcWidth;
+
+
+    const tctx =
+        temp.getContext(
+            "2d",
+            {alpha:false}
+        );
+
+    tctx.save();
+
+    tctx.fillStyle = "#ffffff";
+
+    tctx.fillRect(
+        0,
+        0,
+        temp.width,
+        temp.height
+    );
+
+
+    if(clockwise){
+
+        tctx.translate(temp.width, 0);
+        tctx.rotate(Math.PI / 2);
+    }
+    else{
+
+        tctx.translate(0, temp.height);
+        tctx.rotate(-Math.PI / 2);
+    }
+
+
+    tctx.drawImage(canvas, 0, 0);
+
+    tctx.restore();
+
+
+    /*
+        On redimensionne et on redessine le canvas
+        d'origine afin de conserver le même élément DOM.
+    */
+
+    canvas.width = temp.width;
+    canvas.height = temp.height;
+
+    const ctx =
+        canvas.getContext(
+            "2d",
+            {alpha:false}
+        );
+
+    ctx.drawImage(temp, 0, 0);
+}
+
+
+function rotatePage(direction){
+
+    if(
+        !pdfDocument ||
+        pageCanvases.length === 0
+    ){
+
+        alert(
+            "Aucun PDF chargé."
+        );
+
+        return;
+    }
+
+
+    /*
+        Une image non fixée ne suit pas
+        automatiquement la rotation de la page.
+    */
+
+    if(currentBox){
+
+        const confirmation =
+            confirm(
+                "Une image n'est pas encore fixée sur cette page.\n\n" +
+                "Elle sera perdue si vous faites pivoter la page. Continuer ?"
+            );
+
+
+        if(!confirmation){
+
+            return;
+        }
+
+
+        currentBox.remove();
+
+        currentBox = null;
+    }
+
+
+    const canvas =
+        pageCanvases[currentPage];
+
+    if(!canvas){
+
+        return;
+    }
+
+
+    const previousStyleWidth =
+        canvas.style.width;
+
+    const previousStyleHeight =
+        canvas.style.height;
+
+
+    rotateCanvasStepInPlace(
+        canvas,
+        direction === 1
+    );
+
+
+    /*
+        La largeur/hauteur CSS suivent
+        la rotation (inversion).
+    */
+
+    canvas.style.width =
+        previousStyleHeight || (canvas.width + "px");
+
+    canvas.style.height =
+        previousStyleWidth || (canvas.height + "px");
+
+
+    const activePageDiv =
+        pageDivs[currentPage];
+
+    if(activePageDiv){
+
+        const ratioParts =
+            (activePageDiv.style.aspectRatio || (canvas.width + " / " + canvas.height))
+                .split("/")
+                .map(function(value){
+
+                    return parseFloat(value);
+                });
+
+
+        if(
+            ratioParts.length === 2 &&
+            !isNaN(ratioParts[0]) &&
+            !isNaN(ratioParts[1])
+        ){
+
+            activePageDiv.style.aspectRatio =
+                ratioParts[1] + " / " + ratioParts[0];
+        }
+        else{
+
+            activePageDiv.style.aspectRatio =
+                canvas.width + " / " + canvas.height;
+        }
+    }
+
+
+    const info2 =
+        pageInfos[currentPage];
+
+    if(info2){
+
+        const swapWidthPt = info2.widthPt;
+        info2.widthPt = info2.heightPt;
+        info2.heightPt = swapWidthPt;
+
+        const swapWidthMM = info2.widthMM;
+        info2.widthMM = info2.heightMM;
+        info2.heightMM = swapWidthMM;
+
+        const swapPixelWidth = info2.pixelWidth;
+        info2.pixelWidth = info2.pixelHeight;
+        info2.pixelHeight = swapPixelWidth;
+    }
+
+
+    if(typeof pageRotations[currentPage] !== "number"){
+
+        pageRotations[currentPage] = 0;
+    }
+
+    pageRotations[currentPage] =
+        ((pageRotations[currentPage] + (direction === 1 ? 90 : -90)) % 360 + 360) % 360;
+
+
+    saveActiveState();
+
+    info.textContent =
+        "Page " +
+        (currentPage + 1) +
+        " pivotée.";
+}
+
+
+/* ==========================================================
+   DUPLICATION D'UNE PAGE EN DERNIERE POSITION
+==========================================================
+
+   Copie la page active (rendu + images déjà fixées)
+   et l'ajoute à la toute fin du document actif.
+
+   La page source n'est pas modifiée ; seule une copie
+   indépendante est ajoutée en dernière position.
+========================================================== */
+
+duplicatePageBtn.addEventListener(
+    "click",
+    duplicatePageToEnd
+);
+
+
+async function duplicatePageToEnd(){
+
+    if(
+        !pdfDocument ||
+        pageCanvases.length === 0
+    ){
+
+        alert(
+            "Aucun PDF chargé."
+        );
+
+        return;
+    }
+
+
+    if(currentBox){
+
+        const confirmation =
+            confirm(
+                "Une image n'est pas encore fixée sur la page active.\n\n" +
+                "Voulez-vous la fixer avant de dupliquer la page ?"
+            );
+
+
+        if(!confirmation){
+
+            return;
+        }
+
+
+        await fixImage();
+
+
+        if(currentBox){
+
+            return;
+        }
+    }
+
+
+    const sourceIndex =
+        currentPage;
+
+    const sourceCanvas =
+        pageCanvases[sourceIndex];
+
+    const sourcePageDiv =
+        pageDivs[sourceIndex];
+
+    if(
+        !sourceCanvas ||
+        !sourcePageDiv
+    ){
+
+        alert(
+            "Impossible de dupliquer cette page."
+        );
+
+        return;
+    }
+
+
+    const sourceInfo =
+        pageInfos[sourceIndex];
+
+    const sourceImages =
+        fixedImages[sourceIndex] || [];
+
+    const source =
+        pageSources[sourceIndex] || {
+            pdfDocument: pdfDocument,
+            pageNumber: sourceIndex + 1
+        };
+
+
+    const newCanvas =
+        document.createElement("canvas");
+
+    newCanvas.width = sourceCanvas.width;
+    newCanvas.height = sourceCanvas.height;
+    newCanvas.style.width = sourceCanvas.style.width;
+    newCanvas.style.height = sourceCanvas.style.height;
+
+    const newCtx =
+        newCanvas.getContext(
+            "2d",
+            {alpha:false}
+        );
+
+    newCtx.drawImage(
+        sourceCanvas,
+        0,
+        0
+    );
+
+
+    const newPageDiv =
+        document.createElement("div");
+
+    newPageDiv.className = "page";
+    newPageDiv.style.aspectRatio =
+        sourcePageDiv.style.aspectRatio;
+
+    const newWrap =
+        document.createElement("div");
+
+    newWrap.className = "canvasWrap";
+    newWrap.appendChild(newCanvas);
+    newPageDiv.appendChild(newWrap);
+
+
+    pageCanvases.push(newCanvas);
+
+    pageInfos.push(
+        Object.assign({}, sourceInfo)
+    );
+
+    fixedImages.push(
+        sourceImages.map(
+            function(item){
+
+                return Object.assign({}, item);
+            }
+        )
+    );
+
+    pageSources.push({
+        pdfDocument: source.pdfDocument,
+        pageNumber: source.pageNumber
+    });
+
+    pageDivs.push(newPageDiv);
+
+    pageRotations.push(
+        pageRotations[sourceIndex] || 0
+    );
+
+
+    pages.innerHTML = "";
+
+    pageDivs.forEach(function(pageDiv){
+
+        pages.appendChild(pageDiv);
+    });
+
+
+    rebuildTabs();
+    saveActiveState();
+
+    activatePage(
+        pageCanvases.length - 1
+    );
+
+
+    info.textContent =
+        "Page " +
+        (sourceIndex + 1) +
+        " copiée en dernière position (page " +
+        pageCanvases.length +
+        ").";
+}
+
+
+/* ==========================================================
+   SUPPRESSION D'UNE PAGE ENTIERE
+==========================================================
+
+   Retire complètement la page active du document
+   (rendu + images fixées).
+
+   Impossible si une seule page reste : le document
+   ne doit jamais se retrouver vide.
+========================================================== */
+
+deletePageBtn.addEventListener(
+    "click",
+    deletePage
+);
+
+
+function deletePage(){
+
+    if(
+        !pdfDocument ||
+        pageCanvases.length === 0
+    ){
+
+        alert(
+            "Aucun PDF chargé."
+        );
+
+        return;
+    }
+
+
+    if(pageCanvases.length <= 1){
+
+        alert(
+            "Impossible de supprimer cette page : " +
+            "il s'agit de la seule page restante du document."
+        );
+
+        return;
+    }
+
+
+    let message =
+        "Voulez-vous vraiment supprimer la page " +
+        (currentPage + 1) +
+        " ?\n\n" +
+        "Cette action est irréversible.";
+
+
+    if(currentBox){
+
+        message +=
+            "\n\nL'image en cours de placement " +
+            "sur cette page sera perdue.";
+    }
+
+
+    const confirmation =
+        confirm(message);
+
+
+    if(!confirmation){
+
+        return;
+    }
+
+
+    /*
+        Image temporaire éventuelle : perdue
+        avec la page supprimée.
+    */
+
+    if(currentBox){
+
+        currentBox.remove();
+
+        currentBox = null;
+    }
+
+
+    const removedIndex =
+        currentPage;
+
+
+    /*
+        --------------------------------------------------
+        RETRAIT DES DONNEES
+        --------------------------------------------------
+    */
+
+    pageCanvases.splice(
+        removedIndex,
+        1
+    );
+
+
+    pageInfos.splice(
+        removedIndex,
+        1
+    );
+
+
+    fixedImages.splice(
+        removedIndex,
+        1
+    );
+
+    pageSources.splice(
+        removedIndex,
+        1
+    );
+
+    pageDivs.splice(
+        removedIndex,
+        1
+    );
+
+    pageRotations.splice(
+        removedIndex,
+        1
+    );
+
+    selectedPages = new Set(
+        Array.from(selectedPages)
+            .filter(index => index !== removedIndex)
+            .map(index =>
+                index > removedIndex ? index - 1 : index
+            )
+    );
+
+
+    /*
+        --------------------------------------------------
+        RETRAIT DU BLOC .page DANS LE DOM
+        --------------------------------------------------
+    */
+
+    pages.innerHTML = "";
+
+    pageDivs.forEach(pageDiv => {
+        pages.appendChild(pageDiv);
+    });
+
+
+    /*
+        --------------------------------------------------
+        RENUMEROTATION DES ONGLETS
+        --------------------------------------------------
+
+        Les onglets restants redeviennent
+        "Page 1", "Page 2", ... sans trou.
+    */
+
+    rebuildTabs();
+    saveActiveState();
+
+
+    /*
+        --------------------------------------------------
+        NOUVELLE PAGE ACTIVE
+        --------------------------------------------------
+
+        On reste sur la même position si possible,
+        sinon on recule d'une position (dernière page
+        supprimée).
+    */
+
+    const newCurrent =
+        Math.min(
+            removedIndex,
+            pageCanvases.length - 1
+        );
+
+
+    activatePage(
+        newCurrent
+    );
+
+
+    info.textContent =
+        "Page supprimée — " +
+        pageCanvases.length +
+        " page(s) restante(s).";
+}
+
+
+/* ==========================================================
+   RECONSTRUCTION DES ONGLETS
+==========================================================
+
+   Reconstruit entièrement la liste d'onglets à partir
+   du nombre de pages actuel, afin qu'ils gardent
+   toujours un libellé positionnel correct
+   ("Page 1", "Page 2", ...) après une suppression.
+========================================================== */
+
+function rebuildTabs(){
+
+    pageTabs.innerHTML = "";
+
+    for(
+        let i = 0;
+        i < pageCanvases.length;
+        i++
+    ){
+
+        const tab =
+            document.createElement("button");
+
+        tab.className = "tab";
+        tab.type = "button";
+        tab.textContent = "Page " + (i + 1);
+        tab.title = selectionMode
+            ? "Cliquer pour sélectionner/désélectionner"
+            : "Afficher cette page";
+
+        tab.addEventListener(
+            "click",
+            function(){
+
+                if(selectionMode){
+                    togglePageSelection(i);
+                }else{
+                    activatePage(i);
+                }
+
+            }
+        );
+
+        pageTabs.appendChild(tab);
+    }
+
+    updatePageSelectionVisuals();
+}
+
+
+/* ==========================================================
+   ONGLET DES DOCUMENTS
+========================================================== */
+
+function rebuildDocumentTabs(){
+
+    docTabs.innerHTML = "";
+
+    documents.forEach((doc, index) => {
+
+        const tab =
+            document.createElement("button");
+
+        tab.className = "docTab";
+        tab.type = "button";
+        tab.textContent =
+            "Onglet " + (index + 1) + " — " + doc.name;
+
+        tab.addEventListener(
+            "click",
+            function(){
+                switchDocument(index);
+            }
+        );
+
+        docTabs.appendChild(tab);
+    });
+
+    docTabs
+        .querySelectorAll(".docTab")
+        .forEach((tab, index) => {
+            tab.classList.toggle(
+                "active",
+                index === activeDocumentIndex
+            );
+        });
+}
+
+async function switchDocument(index){
+
+    if(
+        index < 0 ||
+        index >= documents.length
+    ){
+        return;
+    }
+
+    if(currentBox){
+        currentBox.remove();
+        currentBox = null;
+    }
+
+    saveActiveState();
+
+    activeDocumentIndex = index;
+    syncActiveState();
+
+    pages.innerHTML = "";
+
+    pageDivs.forEach(pageDiv => {
+        pages.appendChild(pageDiv);
+    });
+
+    rebuildDocumentTabs();
+    rebuildTabs();
+
+    if(pageCanvases.length){
+        activatePage(
+            Math.min(
+                currentPage,
+                pageCanvases.length - 1
+            )
+        );
+    }
+
+    info.textContent =
+        "Onglet " +
+        (activeDocumentIndex + 1) +
+        " — " +
+        documents[activeDocumentIndex].name +
+        " — " +
+        pageCanvases.length +
+        " page(s).";
+
+    updateCopyControls();
+}
+
+/* ==========================================================
+   COPIE DE PAGE(S) ENTRE DOCUMENTS
+========================================================== */
+
+selectPagesBtn.addEventListener(
+    "click",
+    function(){
+
+        if(!pdfDocument){
+            return;
+        }
+
+        selectionMode = !selectionMode;
+
+        if(!selectionMode){
+            selectedPages.clear();
+            saveActiveState();
+        }
+
+        rebuildTabs();
+        updateCopyControls();
+
+        info.textContent =
+            selectionMode
+                ? "Mode sélection : cliquez sur les pages à sélectionner."
+                : "Mode sélection désactivé.";
+    }
+);
+
+copyTargetSelect.addEventListener(
+    "change",
+    updateCopyControls
+);
+
+copyPageBtn.addEventListener(
+    "click",
+    copyPagesToDocument
+);
+
+async function copyPagesToDocument(){
+
+    const targetIndex =
+        parseInt(copyTargetSelect.value, 10);
+
+    if(
+        !Number.isInteger(targetIndex) ||
+        targetIndex < 0 ||
+        targetIndex >= documents.length ||
+        targetIndex === activeDocumentIndex
+    ){
+        alert("Choisissez un autre onglet comme document cible.");
+        return;
+    }
+
+    if(!pdfDocument || pageCanvases.length === 0){
+        alert("Aucune page disponible.");
+        return;
+    }
+
+    if(currentBox){
+        const confirmation =
+            confirm(
+                "Une image n'est pas encore fixée sur la page active.\n\n" +
+                "Voulez-vous la fixer avant la copie ?"
+            );
+
+        if(!confirmation){
+            return;
+        }
+
+        await fixImage();
+
+        if(currentBox){
+            return;
+        }
+    }
+
+    let indexes =
+        selectedPages.size
+            ? Array.from(selectedPages).sort((a,b) => a-b)
+            : [currentPage];
+
+    indexes =
+        indexes.filter(
+            index =>
+                index >= 0 &&
+                index < pageCanvases.length
+        );
+
+    if(!indexes.length){
+        alert("Aucune page à copier.");
+        return;
+    }
+
+    const target =
+        documents[targetIndex];
+
+    for(const sourceIndex of indexes){
+
+        const sourceCanvas =
+            pageCanvases[sourceIndex];
+
+        const sourcePageDiv =
+            pageDivs[sourceIndex];
+
+        if(!sourceCanvas || !sourcePageDiv){
+            continue;
+        }
+
+        const sourceInfo =
+            pageInfos[sourceIndex];
+
+        const sourceImages =
+            fixedImages[sourceIndex] || [];
+
+        const source =
+            pageSources[sourceIndex] || {
+                pdfDocument: pdfDocument,
+                pageNumber: sourceIndex + 1
+            };
+
+        const newCanvas =
+            document.createElement("canvas");
+
+        newCanvas.width = sourceCanvas.width;
+        newCanvas.height = sourceCanvas.height;
+        newCanvas.style.width =
+            sourceCanvas.style.width;
+        newCanvas.style.height =
+            sourceCanvas.style.height;
+
+        const newCtx =
+            newCanvas.getContext(
+                "2d",
+                {alpha:false}
+            );
+
+        newCtx.drawImage(
+            sourceCanvas,
+            0,
+            0
+        );
+
+        const newPageDiv =
+            document.createElement("div");
+
+        newPageDiv.className = "page";
+        newPageDiv.style.aspectRatio =
+            sourcePageDiv.style.aspectRatio;
+
+        const newWrap =
+            document.createElement("div");
+
+        newWrap.className = "canvasWrap";
+        newWrap.appendChild(newCanvas);
+        newPageDiv.appendChild(newWrap);
+
+        target.pageCanvases.push(newCanvas);
+        target.pageInfos.push(
+            Object.assign({}, sourceInfo)
+        );
+        target.fixedImages.push(
+            sourceImages.map(
+                item => Object.assign({}, item)
+            )
+        );
+        target.pageSources.push({
+            pdfDocument: source.pdfDocument,
+            pageNumber: source.pageNumber
+        });
+        target.pageDivs.push(newPageDiv);
+
+        target.pageRotations.push(
+            pageRotations[sourceIndex] || 0
+        );
+    }
+
+    target.currentPage =
+        target.pageCanvases.length - 1;
+
+    target.selectedPages.clear();
+
+    saveActiveState();
+
+    const copiedCount = indexes.length;
+
+    if(targetIndex === activeDocumentIndex){
+
+        syncActiveState();
+
+        pages.innerHTML = "";
+
+        pageDivs.forEach(pageDiv => {
+            pages.appendChild(pageDiv);
+        });
+
+        rebuildTabs();
+        activatePage(
+            pageCanvases.length - 1
+        );
+
+    }else{
+
+        documents[targetIndex] = target;
+    }
+
+    info.textContent =
+        copiedCount +
+        " page(s) copiée(s) vers Onglet " +
+        (targetIndex + 1) +
+        " — ajoutée(s) en dernière position.";
+
+    selectionMode = false;
+    selectedPages.clear();
+    updateCopyControls();
+}
+
+/* ==========================================================
+   MERGE ALL DOCUMENTS
+========================================================== */
+
+mergeAllBtn.addEventListener(
+    "click",
+    mergeAllDocuments
+);
+
+async function mergeAllDocuments(){
+
+    if(documents.length < 2){
+
+        alert(
+            "Ouvrez au moins deux PDF."
+        );
+
+        return;
+    }
+
+    if(currentBox){
+
+        currentBox.remove();
+
+        currentBox = null;
+    }
+
+    const mergedDoc = {
+
+        name: "Fusion PDF",
+
+        pdfDocument: null,
+
+        pageCanvases: [],
+
+        pageInfos: [],
+
+        fixedImages: [],
+
+        pageSources: [],
+
+        pageDivs: [],
+
+        pageRotations: [],
+
+        currentPage: 0,
+
+        selectedPages: new Set()
+    };
+
+    for(const sourceDoc of documents){
+
+        for(
+            let i = 0;
+            i < sourceDoc.pageCanvases.length;
+            i++
+        ){
+
+            const sourceCanvas =
+                sourceDoc.pageCanvases[i];
+
+            const sourcePageDiv =
+                sourceDoc.pageDivs[i];
+
+            const newCanvas =
+                document.createElement(
+                    "canvas"
+                );
+
+            newCanvas.width =
+                sourceCanvas.width;
+
+            newCanvas.height =
+                sourceCanvas.height;
+
+            newCanvas.style.width =
+                sourceCanvas.style.width;
+
+            newCanvas.style.height =
+                sourceCanvas.style.height;
+
+            const ctx =
+                newCanvas.getContext(
+                    "2d"
+                );
+
+            ctx.drawImage(
+                sourceCanvas,
+                0,
+                0
+            );
+
+            const newPageDiv =
+                document.createElement(
+                    "div"
+                );
+
+            newPageDiv.className =
+                "page";
+
+            newPageDiv.style.aspectRatio =
+                sourcePageDiv.style.aspectRatio;
+
+            const newWrap =
+                document.createElement(
+                    "div"
+                );
+
+            newWrap.className =
+                "canvasWrap";
+
+            newWrap.appendChild(
+                newCanvas
+            );
+
+            newPageDiv.appendChild(
+                newWrap
+            );
+
+            mergedDoc.pageCanvases.push(
+                newCanvas
+            );
+
+            mergedDoc.pageInfos.push(
+                Object.assign(
+                    {},
+                    sourceDoc.pageInfos[i]
+                )
+            );
+
+            mergedDoc.fixedImages.push(
+                (
+                    sourceDoc.fixedImages[i] || []
+                ).map(
+                    item =>
+                        Object.assign(
+                            {},
+                            item
+                        )
+                )
+            );
+
+            mergedDoc.pageSources.push(
+                sourceDoc.pageSources[i]
+            );
+
+            mergedDoc.pageDivs.push(
+                newPageDiv
+            );
+
+            mergedDoc.pageRotations.push(
+                sourceDoc.pageRotations[i] || 0
+            );
+        }
+    }
+
+    documents.push(
+        mergedDoc
+    );
+
+    rebuildDocumentTabs();
+
+    await switchDocument(
+        documents.length - 1
+    );
+
+    info.textContent =
+        "Fusion terminée : " +
+        mergedDoc.pageCanvases.length +
+        " pages.";
+}
+
+/* ==========================================================
+   CHARGEMENT PDF
+========================================================== */
+
+pdfInput.addEventListener(
+    "change",
+    loadPdf
+);
+
+
+async function loadPdf(e){
+
+    const files = Array.from(e.target.files || []);
+
+    if(!files.length){
+        return;
+    }
+
+    if(currentBox){
+        currentBox.remove();
+        currentBox = null;
+    }
+
+    for(const file of files){
+
+        info.textContent =
+            "Chargement de " + file.name + " en haute résolution...";
+
+        try{
+
+            const arrayBuffer =
+                await file.arrayBuffer();
+
+            const loadedPdf =
+                await pdfjsLib
+                    .getDocument({
+                        data:arrayBuffer
+                    })
+                    .promise;
+
+            const doc = {
+                name: file.name,
+                pdfDocument: loadedPdf,
+                pageCanvases: [],
+                pageInfos: [],
+                fixedImages: [],
+                pageSources: [],
+                pageDivs: [],
+                pageRotations: [],
+                currentPage: 0,
+                selectedPages: new Set()
+            };
+
+            for(
+                let pageNumber = 1;
+                pageNumber <= loadedPdf.numPages;
+                pageNumber++
+            ){
+
+                const page =
+                    await loadedPdf.getPage(pageNumber);
+
+                const originalViewport =
+                    page.getViewport({scale:1});
+
+                const viewport =
+                    page.getViewport({
+                        scale:RENDER_SCALE
+                    });
+
+                const canvas =
+                    document.createElement("canvas");
+
+                canvas.width =
+                    Math.ceil(viewport.width);
+
+                canvas.height =
+                    Math.ceil(viewport.height);
+
+                const ctx =
+                    canvas.getContext(
+                        "2d",
+                        {alpha:false}
+                    );
+
+                ctx.save();
+                ctx.fillStyle = "#ffffff";
+                ctx.fillRect(
+                    0,
+                    0,
+                    canvas.width,
+                    canvas.height
+                );
+                ctx.restore();
+
+                await page.render({
+                    canvasContext:ctx,
+                    viewport:viewport,
+                    background:"white"
+                }).promise;
+
+                doc.pageCanvases.push(canvas);
+                doc.fixedImages.push([]);
+
+                doc.pageInfos.push({
+                    widthPt: originalViewport.width,
+                    heightPt: originalViewport.height,
+                    widthMM:
+                        originalViewport.width * 25.4 / 72,
+                    heightMM:
+                        originalViewport.height * 25.4 / 72,
+                    pixelWidth: canvas.width,
+                    pixelHeight: canvas.height
+                });
+
+                doc.pageSources.push({
+                    pdfDocument: loadedPdf,
+                    pageNumber: pageNumber
+                });
+
+                const pageDiv =
+                    document.createElement("div");
+
+                pageDiv.className = "page";
+                pageDiv.style.aspectRatio =
+                    originalViewport.width +
+                    " / " +
+                    originalViewport.height;
+
+                const wrap =
+                    document.createElement("div");
+
+                wrap.className = "canvasWrap";
+
+                canvas.style.width =
+                    originalViewport.width + "px";
+
+                canvas.style.height =
+                    originalViewport.height + "px";
+
+                wrap.appendChild(canvas);
+                pageDiv.appendChild(wrap);
+
+                doc.pageDivs.push(pageDiv);
+
+                doc.pageRotations.push(0);
+
+                info.textContent =
+                    "Chargement " +
+                    file.name +
+                    " — page " +
+                    pageNumber +
+                    " / " +
+                    loadedPdf.numPages +
+                    " — " +
+                    RENDER_DPI +
+                    " DPI";
+            }
+
+            documents.push(doc);
+
+        }
+        catch(error){
+
+            console.error(
+                "Erreur PDF :",
+                file.name,
+                error
+            );
+
+            alert(
+                "Impossible de charger le PDF : " +
+                file.name
+            );
+        }
+    }
+
+    e.target.value = "";
+
+    if(documents.length){
+        await switchDocument(documents.length - 1);
+    }
+}
+
+
+/* ==========================================================
+   CHARGEMENT IMAGE
+========================================================== */
+
+imgInput.addEventListener(
+    "change",
+    loadImage
+);
+
+
+function loadImage(e){
+
+    const file =
+        e.target.files[0];
+
+
+    if(!file){
+
+        return;
+    }
+
+
+    if(!pdfDocument){
+
+        alert(
+            "Veuillez d'abord charger un PDF."
+        );
+
+        e.target.value = "";
+
+        return;
+    }
+
+
+    const wrap =
+        getActiveWrap();
+
+
+    if(!wrap){
+
+        alert(
+            "Aucune page active."
+        );
+
+        return;
+    }
+
+
+    /*
+        Supprimer ancienne image temporaire.
+    */
+
+    if(currentBox){
+
+        currentBox.remove();
+
+        currentBox = null;
+    }
+
+
+    /*
+        Création boîte.
+    */
+
+    const box =
+        document.createElement(
+            "div"
+        );
+
+
+    box.className =
+        "imageBox";
+
+
+    /*
+        Taille initiale adaptée.
+    */
+
+    const availableWidth =
+        Math.max(
+            80,
+            wrap.clientWidth - 20
+        );
+
+
+    const initialSize =
+        Math.min(
+            200,
+            availableWidth
+        );
+
+
+    box.style.width =
+        initialSize + "px";
+
+
+    box.style.height =
+        initialSize + "px";
+
+
+    box.style.left =
+        "20px";
+
+
+    box.style.top =
+        "20px";
+
+
+    /*
+        Image.
+    */
+
+    const img =
+        document.createElement(
+            "img"
+        );
+
+
+    img.alt =
+        "Image à intégrer";
+
+
+    /*
+        Poignée.
+    */
+
+    const resize =
+        document.createElement(
+            "div"
+        );
+
+
+    resize.className =
+        "resize";
+
+
+    box.appendChild(
+        img
+    );
+
+
+    box.appendChild(
+        resize
+    );
+
+
+    wrap.appendChild(
+        box
+    );
+
+
+    /*
+        Lecture fichier.
+    */
+
+    const reader =
+        new FileReader();
+
+
+    reader.onload =
+        function(ev){
+
+            img.src =
+                ev.target.result;
+
+        };
+
+
+    reader.onerror =
+        function(){
+
+            alert(
+                "Impossible de lire l'image."
+            );
+
+
+            box.remove();
+
+
+            if(
+                currentBox === box
+            ){
+
+                currentBox = null;
+            }
+        };
+
+
+    reader.readAsDataURL(
+        file
+    );
+
+
+    currentBox =
+        box;
+
+
+    enableDrag(
+        box
+    );
+
+
+    enableResize(
+        box,
+        resize
+    );
+
+
+    info.textContent =
+        "Image ajoutée. Déplacez-la puis cliquez sur « Fixer l'image ».";
+
+
+    /*
+        Autorise la sélection ultérieure
+        du même fichier.
+    */
+
+    e.target.value = "";
+}
+
+
+/* ==========================================================
+   DEPLACEMENT
+========================================================== */
+
+function enableDrag(box){
+
+    let dragging =
+        false;
+
+
+    let startX =
+        0;
+
+
+    let startY =
+        0;
+
+
+    let startLeft =
+        0;
+
+
+    let startTop =
+        0;
+
+
+    box.addEventListener(
+        "pointerdown",
+        function(e){
+
+            if(
+                e.target.classList.contains(
+                    "resize"
+                )
+            ){
+
+                return;
+            }
+
+
+            dragging =
+                true;
+
+
+            startX =
+                e.clientX;
+
+
+            startY =
+                e.clientY;
+
+
+            startLeft =
+                parseFloat(
+                    box.style.left
+                ) || 0;
+
+
+            startTop =
+                parseFloat(
+                    box.style.top
+                ) || 0;
+
+
+            try{
+
+                box.setPointerCapture(
+                    e.pointerId
+                );
+
+            }
+            catch(error){}
+
+
+            e.preventDefault();
+        }
+    );
+
+
+    box.addEventListener(
+        "pointermove",
+        function(e){
+
+            if(!dragging){
+
+                return;
+            }
+
+
+            const wrap =
+                box.parentElement;
+
+
+            if(!wrap){
+
+                return;
+            }
+
+
+            const maxLeft =
+                Math.max(
+                    0,
+                    wrap.clientWidth -
+                    box.offsetWidth
+                );
+
+
+            const maxTop =
+                Math.max(
+                    0,
+                    wrap.clientHeight -
+                    box.offsetHeight
+                );
+
+
+            const newLeft =
+                startLeft +
+                (
+                    e.clientX -
+                    startX
+                );
+
+
+            const newTop =
+                startTop +
+                (
+                    e.clientY -
+                    startY
+                );
+
+
+            box.style.left =
+                clamp(
+                    newLeft,
+                    0,
+                    maxLeft
+                ) + "px";
+
+
+            box.style.top =
+                clamp(
+                    newTop,
+                    0,
+                    maxTop
+                ) + "px";
+        }
+    );
+
+
+    box.addEventListener(
+        "pointerup",
+        function(e){
+
+            dragging =
+                false;
+
+
+            try{
+
+                box.releasePointerCapture(
+                    e.pointerId
+                );
+
+            }
+            catch(error){}
+        }
+    );
+
+
+    box.addEventListener(
+        "pointercancel",
+        function(){
+
+            dragging =
+                false;
+        }
+    );
+}
+
+
+/* ==========================================================
+   REDIMENSIONNEMENT
+========================================================== */
+
+function enableResize(
+    box,
+    handle
+){
+
+    let resizing =
+        false;
+
+
+    let startX =
+        0;
+
+
+    let startY =
+        0;
+
+
+    let startWidth =
+        0;
+
+
+    let startHeight =
+        0;
+
+
+    handle.addEventListener(
+        "pointerdown",
+        function(e){
+
+            resizing =
+                true;
+
+
+            startX =
+                e.clientX;
+
+
+            startY =
+                e.clientY;
+
+
+            startWidth =
+                box.offsetWidth;
+
+
+            startHeight =
+                box.offsetHeight;
+
+
+            try{
+
+                handle.setPointerCapture(
+                    e.pointerId
+                );
+
+            }
+            catch(error){}
+
+
+            e.stopPropagation();
+
+            e.preventDefault();
+        }
+    );
+
+
+    handle.addEventListener(
+        "pointermove",
+        function(e){
+
+            if(!resizing){
+
+                return;
+            }
+
+
+            const wrap =
+                box.parentElement;
+
+
+            if(!wrap){
+
+                return;
+            }
+
+
+            /*
+                Redimensionnement proportionnel.
+            */
+
+            const deltaX =
+                e.clientX -
+                startX;
+
+
+            const deltaY =
+                e.clientY -
+                startY;
+
+
+            const delta =
+                Math.max(
+                    deltaX,
+                    deltaY
+                );
+
+
+            const left =
+                parseFloat(
+                    box.style.left
+                ) || 0;
+
+
+            const top =
+                parseFloat(
+                    box.style.top
+                ) || 0;
+
+
+            const maxWidth =
+                Math.max(
+                    20,
+                    wrap.clientWidth -
+                    left
+                );
+
+
+            const maxHeight =
+                Math.max(
+                    20,
+                    wrap.clientHeight -
+                    top
+                );
+
+
+            const maxSize =
+                Math.min(
+                    maxWidth,
+                    maxHeight
+                );
+
+
+            const newSize =
+                clamp(
+                    startWidth + delta,
+                    20,
+                    maxSize
+                );
+
+
+            box.style.width =
+                newSize + "px";
+
+
+            box.style.height =
+                newSize + "px";
+        }
+    );
+
+
+    handle.addEventListener(
+        "pointerup",
+        function(e){
+
+            resizing =
+                false;
+
+
+            try{
+
+                handle.releasePointerCapture(
+                    e.pointerId
+                );
+
+            }
+            catch(error){}
+        }
+    );
+
+
+    handle.addEventListener(
+        "pointercancel",
+        function(){
+
+            resizing =
+                false;
+        }
+    );
+}
+
+
+/* ==========================================================
+   FIXER IMAGE
+========================================================== */
+
+fixBtn.addEventListener(
+    "click",
+    fixImage
+);
+
+
+async function fixImage(){
+
+    if(!currentBox){
+
+        alert(
+            "Aucune image à fixer."
+        );
+
+        return;
+    }
+
+
+    const canvas =
+        getActiveCanvas();
+
+
+    const wrap =
+        getActiveWrap();
+
+
+    if(!canvas || !wrap){
+
+        alert(
+            "Canvas introuvable."
+        );
+
+        return;
+    }
+
+
+    const imgElement =
+        currentBox.querySelector(
+            "img"
+        );
+
+
+    if(
+        !imgElement ||
+        !imgElement.src
+    ){
+
+        alert(
+            "L'image n'est pas encore prête."
+        );
+
+        return;
+    }
+
+
+    fixBtn.disabled =
+        true;
+
+
+    try{
+
+        /*
+            ==================================================
+            RECUPERATION DES DIMENSIONS REELLES A L'ECRAN
+            ==================================================
+
+            Indispensable sur mobile/tablette.
+
+            Le canvas peut faire 2480 pixels de large
+            mais être affiché à 390 pixels.
+        */
+
+        const canvasRect =
+            canvas.getBoundingClientRect();
+
+
+        const boxRect =
+            currentBox.getBoundingClientRect();
+
+
+        if(
+            canvasRect.width <= 0 ||
+            canvasRect.height <= 0 ||
+            boxRect.width <= 0 ||
+            boxRect.height <= 0
+        ){
+
+            throw new Error(
+                "Dimensions d'affichage invalides."
+            );
+        }
+
+
+        /*
+            Facteur écran -> canvas 300 DPI.
+        */
+
+        const scaleX =
+            canvas.width /
+            canvasRect.width;
+
+
+        const scaleY =
+            canvas.height /
+            canvasRect.height;
+
+
+        /*
+            ==================================================
+            POSITION DE LA BOITE
+            ==================================================
+        */
+
+        let boxX =
+            (
+                boxRect.left -
+                canvasRect.left
+            ) *
+            scaleX;
+
+
+        let boxY =
+            (
+                boxRect.top -
+                canvasRect.top
+            ) *
+            scaleY;
+
+
+        /*
+            ==================================================
+            DIMENSIONS DE LA BOITE
+            ==================================================
+        */
+
+        let boxWidth =
+            boxRect.width *
+            scaleX;
+
+
+        let boxHeight =
+            boxRect.height *
+            scaleY;
+
+
+        /*
+            ==================================================
+            LIMITES
+            ==================================================
+        */
+
+        boxX =
+            clamp(
+                boxX,
+                0,
+                canvas.width
+            );
+
+
+        boxY =
+            clamp(
+                boxY,
+                0,
+                canvas.height
+            );
+
+
+        boxWidth =
+            Math.min(
+                boxWidth,
+                canvas.width -
+                boxX
+            );
+
+
+        boxHeight =
+            Math.min(
+                boxHeight,
+                canvas.height -
+                boxY
+            );
+
+
+        /*
+            ==================================================
+            CHARGEMENT IMAGE
+            ==================================================
+        */
+
+        const image =
+            await loadImageElement(
+                imgElement.src
+            );
+
+
+        /*
+            ==================================================
+            OBJECT-FIT: CONTAIN
+            ==================================================
+
+            L'image affichée dans la boîte conserve
+            son ratio d'origine.
+
+            C'est exactement ce que fait le CSS :
+
+                object-fit: contain;
+        */
+
+        const imageWidth =
+            image.naturalWidth ||
+            image.width;
+
+
+        const imageHeight =
+            image.naturalHeight ||
+            image.height;
+
+
+        if(
+            !imageWidth ||
+            !imageHeight
+        ){
+
+            throw new Error(
+                "Dimensions originales de l'image invalides."
+            );
+        }
+
+
+        const imageRatio =
+            imageWidth /
+            imageHeight;
+
+
+        const boxRatio =
+            boxWidth /
+            boxHeight;
+
+
+        let drawWidth;
+
+        let drawHeight;
+
+
+        if(
+            imageRatio >
+            boxRatio
+        ){
+
+            /*
+                Image limitée par la largeur.
+            */
+
+            drawWidth =
+                boxWidth;
+
+
+            drawHeight =
+                boxWidth /
+                imageRatio;
+
+        }
+        else{
+
+            /*
+                Image limitée par la hauteur.
+            */
+
+            drawHeight =
+                boxHeight;
+
+
+            drawWidth =
+                boxHeight *
+                imageRatio;
+        }
+
+
+        /*
+            ==================================================
+            CENTRAGE DANS LA BOITE
+            ==================================================
+
+            Les marges laissées par "contain"
+            sont conservées.
+        */
+
+        const marginX =
+            (
+                boxWidth -
+                drawWidth
+            ) / 2;
+
+
+        const marginY =
+            (
+                boxHeight -
+                drawHeight
+            ) / 2;
+
+
+        const finalX =
+            boxX +
+            marginX;
+
+
+        const finalY =
+            boxY +
+            marginY;
+
+
+        /*
+            ==================================================
+            OBJET IMAGE SAUVEGARDE
+            ==================================================
+
+            On conserve :
+
+            - position réelle de l'image
+            - taille réelle de l'image
+            - position de la boîte
+            - taille de la boîte
+
+            Cela permet une reconstruction exacte
+            après suppression.
+        */
+
+        const item = {
+
+            src:
+                image.src,
+
+            x:
+                finalX,
+
+            y:
+                finalY,
+
+            width:
+                drawWidth,
+
+            height:
+                drawHeight,
+
+            boxX:
+                boxX,
+
+            boxY:
+                boxY,
+
+            boxWidth:
+                boxWidth,
+
+            boxHeight:
+                boxHeight
+        };
+
+
+        fixedImages[currentPage].push(
+            item
+        );
+
+
+        /*
+            ==================================================
+            DESSIN SUR LE CANVAS
+            ==================================================
+        */
+
+        const ctx =
+            canvas.getContext(
+                "2d"
+            );
+
+
+        ctx.save();
+
+
+        ctx.imageSmoothingEnabled =
+            true;
+
+
+        ctx.imageSmoothingQuality =
+            "high";
+
+
+        ctx.drawImage(
+
+            image,
+
+            finalX,
+
+            finalY,
+
+            drawWidth,
+
+            drawHeight
+
+        );
+
+
+        ctx.restore();
+
+
+        /*
+            ==================================================
+            SUPPRESSION BOITE TEMPORAIRE
+            ==================================================
+        */
+
+        currentBox.remove();
+
+        currentBox =
+            null;
+
+
+        info.textContent =
+            "Image fixée sur la page " +
+            (currentPage + 1) +
+            " à " +
+            RENDER_DPI +
+            " DPI.";
+
+
+    }
+    catch(error){
+
+        console.error(
+            "Erreur fixation image :",
+            error
+        );
+
+
+        alert(
+            "Impossible de fixer l'image."
+        );
+
+    }
+    finally{
+
+        fixBtn.disabled =
+            false;
+    }
+}
+
+
+/* ==========================================================
+   CHARGEMENT IMAGE PROMESSE
+========================================================== */
+
+function loadImageElement(src){
+
+    return new Promise(
+        function(resolve, reject){
+
+            const img =
+                new Image();
+
+
+            img.onload =
+                function(){
+
+                    resolve(
+                        img
+                    );
+                };
+
+
+            img.onerror =
+                function(){
+
+                    reject(
+                        new Error(
+                            "Impossible de charger l'image."
+                        )
+                    );
+                };
+
+
+            img.src =
+                src;
+        }
+    );
+}
+
+
+/* ==========================================================
+   DESSIN IMAGE SAUVEGARDEE
+========================================================== */
+
+function drawStoredImage(
+    ctx,
+    item
+){
+
+    return new Promise(
+        function(resolve){
+
+            const img =
+                new Image();
+
+
+            img.onload =
+                function(){
+
+                    ctx.save();
+
+
+                    ctx.imageSmoothingEnabled =
+                        true;
+
+
+                    ctx.imageSmoothingQuality =
+                        "high";
+
+
+                    ctx.drawImage(
+
+                        img,
+
+                        item.x,
+
+                        item.y,
+
+                        item.width,
+
+                        item.height
+                    );
+
+
+                    ctx.restore();
+
+
+                    resolve();
+                };
+
+
+            img.onerror =
+                function(){
+
+                    resolve();
+                };
+
+
+            img.src =
+                item.src;
+        }
+    );
+}
+
+
+/* ==========================================================
+   REREND PAGE
+==========================================================
+
+   Utilisé lorsqu'on supprime une image fixée.
+
+   On rerend uniquement la page concernée depuis PDF.js.
+
+   On évite complètement les copies de canvases.
+========================================================== */
+
+async function rerenderPage(
+    pageIndex
+){
+
+    if(!pdfDocument){
+
+        return;
+    }
+
+
+    const canvas =
+        pageCanvases[pageIndex];
+
+
+    if(!canvas){
+
+        return;
+    }
+
+
+    const source =
+        pageSources[pageIndex] || {
+            pdfDocument: pdfDocument,
+            pageNumber: pageIndex + 1
+        };
+
+    const page =
+        await source.pdfDocument.getPage(
+            source.pageNumber
+        );
+
+
+    const viewport =
+        page.getViewport({
+            scale:RENDER_SCALE
+        });
+
+
+    /*
+        Dimensions correctes du canvas.
+    */
+
+    canvas.width =
+        Math.ceil(
+            viewport.width
+        );
+
+
+    canvas.height =
+        Math.ceil(
+            viewport.height
+        );
+
+
+    const ctx =
+        canvas.getContext(
+            "2d",
+            {
+                alpha:false
+            }
+        );
+
+
+    /*
+        Nettoyage complet.
+    */
+
+    ctx.save();
+
+    ctx.setTransform(
+        1,
+        0,
+        0,
+        1,
+        0,
+        0
+    );
+
+
+    ctx.clearRect(
+        0,
+        0,
+        canvas.width,
+        canvas.height
+    );
+
+
+    /*
+        Fond blanc.
+    */
+
+    ctx.fillStyle =
+        "#ffffff";
+
+
+    ctx.fillRect(
+        0,
+        0,
+        canvas.width,
+        canvas.height
+    );
+
+
+    ctx.restore();
+
+
+    /*
+        PDF original.
+    */
+
+    await page.render({
+
+        canvasContext:ctx,
+
+        viewport:viewport,
+
+        background:"white"
+
+    }).promise;
+
+
+    /*
+        Réappliquer les images restantes.
+    */
+
+    const images =
+        fixedImages[pageIndex] || [];
+
+
+    for(
+        const item of images
+    ){
+
+        await drawStoredImage(
+            ctx,
+            item
+        );
+    }
+
+
+    /*
+        --------------------------------------------------
+        RE-APPLICATION DE LA ROTATION
+        --------------------------------------------------
+
+        Si la page avait été pivotée avant la suppression
+        de l'image, on réapplique cette rotation au rendu
+        fraîchement reconstruit depuis le PDF source.
+    */
+
+    const rotationDegrees =
+        pageRotations[pageIndex] || 0;
+
+    if(rotationDegrees !== 0){
+
+        const steps =
+            Math.round(rotationDegrees / 90) % 4;
+
+        const previousStyleWidth =
+            canvas.style.width;
+
+        const previousStyleHeight =
+            canvas.style.height;
+
+
+        for(
+            let s = 0;
+            s < steps;
+            s++
+        ){
+
+            rotateCanvasStepInPlace(
+                canvas,
+                true
+            );
+        }
+
+
+        const activePageDiv =
+            pageDivs[pageIndex];
+
+        if(activePageDiv){
+
+            activePageDiv.style.aspectRatio =
+                canvas.width + " / " + canvas.height;
+        }
+
+
+        /*
+            Une rotation impaire (90°/270°) inverse
+            la largeur/hauteur CSS ; une rotation
+            paire (180°) les laisse inchangées.
+        */
+
+        if((steps % 2) === 1){
+
+            canvas.style.width =
+                previousStyleHeight || (canvas.width + "px");
+
+            canvas.style.height =
+                previousStyleWidth || (canvas.height + "px");
+        }
+        else{
+
+            canvas.style.width =
+                previousStyleWidth || (canvas.width + "px");
+
+            canvas.style.height =
+                previousStyleHeight || (canvas.height + "px");
+        }
+
+
+        const info2 =
+            pageInfos[pageIndex];
+
+        if(
+            info2 &&
+            (steps % 2) === 1
+        ){
+
+            const swapWidthPt = info2.widthPt;
+            info2.widthPt = info2.heightPt;
+            info2.heightPt = swapWidthPt;
+
+            const swapWidthMM = info2.widthMM;
+            info2.widthMM = info2.heightMM;
+            info2.heightMM = swapWidthMM;
+
+            const swapPixelWidth = info2.pixelWidth;
+            info2.pixelWidth = info2.pixelHeight;
+            info2.pixelHeight = swapPixelWidth;
+        }
+    }
+}
+
+
+/* ==========================================================
+   SUPPRESSION IMAGE
+========================================================== */
+
+deleteBtn.addEventListener(
+    "click",
+    deleteImage
+);
+
+
+async function deleteImage(){
+
+    /*
+        --------------------------------------------------
+        IMAGE TEMPORAIRE
+        --------------------------------------------------
+    */
+
+    if(currentBox){
+
+        currentBox.remove();
+
+        currentBox =
+            null;
+
+
+        info.textContent =
+            "Image non fixée supprimée.";
+
+
+        return;
+    }
+
+
+    /*
+        --------------------------------------------------
+        IMAGE FIXEE
+        --------------------------------------------------
+    */
+
+    const images =
+        fixedImages[currentPage];
+
+
+    if(
+        !images ||
+        images.length === 0
+    ){
+
+        alert(
+            "Aucune image à supprimer sur cette page."
+        );
+
+        return;
+    }
+
+
+    const confirmation =
+        confirm(
+            "Voulez-vous supprimer la dernière image fixée sur cette page ?"
+        );
+
+
+    if(!confirmation){
+
+        return;
+    }
+
+
+    /*
+        Retire la dernière image
+        de la liste.
+    */
+
+    images.pop();
+
+
+    deleteBtn.disabled =
+        true;
+
+
+    info.textContent =
+        "Reconstruction de la page...";
+
+
+    try{
+
+        await rerenderPage(
+            currentPage
+        );
+
+
+        info.textContent =
+            "Dernière image fixée supprimée de la page " +
+            (currentPage + 1) +
+            ".";
+
+    }
+    catch(error){
+
+        console.error(
+            "Erreur suppression :",
+            error
+        );
+
+
+        alert(
+            "Impossible de reconstruire la page."
+        );
+
+    }
+    finally{
+
+        deleteBtn.disabled =
+            false;
+    }
+}
+
+
+/* ==========================================================
+   IMPRESSION
+========================================================== */
+
+printBtn.addEventListener(
+    "click",
+    printAllPages
+);
+
+
+async function printAllPages(){
+
+if(
+    pageCanvases.length === 0
+){
+
+    alert(
+        "Aucune page disponible."
+    );
+
+    return;
+}
+
+
+    /*
+        Image temporaire.
+    */
+
+    if(currentBox){
+
+        const confirmation =
+            confirm(
+                "Une image n'est pas encore fixée.\n\n" +
+                "Voulez-vous la fixer avant l'impression ?"
+            );
+
+
+        if(!confirmation){
+
+            return;
+        }
+
+
+        await fixImage();
+
+
+        /*
+            Si la fixation a échoué,
+            on n'imprime pas.
+        */
+
+        if(currentBox){
+
+            return;
+        }
+    }
+
+
+    /*
+        Laisse le navigateur terminer
+        les éventuels dessins.
+    */
+
+    await new Promise(
+        function(resolve){
+
+            requestAnimationFrame(
+                function(){
+
+                    requestAnimationFrame(
+                        resolve
+                    );
+
+                }
+            );
+        }
+    );
+
+
+    window.print();
+}
+
+
+/* ==========================================================
+   PROTECTION DRAG NATIF
+========================================================== */
+
+document.addEventListener(
+    "dragstart",
+    function(e){
+
+        if(
+            e.target.tagName === "IMG"
+        ){
+
+            e.preventDefault();
+        }
+    }
+);
+
+
+/* ==========================================================
+   AIDE
+========================================================== */
+
+helpBtn.addEventListener(
+    "click",
+    function(){
+
+        helpOverlay.classList.add(
+            "active"
+        );
+    }
+);
+
+
+helpClose.addEventListener(
+    "click",
+    function(){
+
+        helpOverlay.classList.remove(
+            "active"
+        );
+    }
+);
+
+
+helpCloseBottom.addEventListener(
+    "click",
+    function(){
+
+        helpOverlay.classList.remove(
+            "active"
+        );
+    }
+);
+
+
+helpOverlay.addEventListener(
+    "click",
+    function(e){
+
+        if(
+            e.target === helpOverlay
+        ){
+
+            helpOverlay.classList.remove(
+                "active"
+            );
+        }
+    }
+);
+
+
+document.addEventListener(
+    "keydown",
+    function(e){
+
+        if(
+            e.key === "Escape"
+        ){
+
+            helpOverlay.classList.remove(
+                "active"
+            );
+        }
+    }
+);
+
+
+/* ==========================================================
+   AVERTISSEMENT SÉCURITÉ — provenance des fichiers
+   ----------------------------------------------------------
+   1) Affiché systématiquement à l'ouverture de la page.
+   2) Une confirmation est redemandée à chaque sélection
+      de fichier (PDF ou image) ; si l'utilisateur annule,
+      le fichier n'est pas chargé (le chargement normal —
+      loadPdf / l'écouteur de imgInput — est bloqué).
+========================================================== */
+
+securityOverlay.classList.add(
+    "active"
+);
+
+
+securityClose.addEventListener(
+    "click",
+    function(){
+
+        securityOverlay.classList.remove(
+            "active"
+        );
+    }
+);
+
+
+securityAck.addEventListener(
+    "click",
+    function(){
+
+        securityOverlay.classList.remove(
+            "active"
+        );
+    }
+);
+
+
+securityOverlay.addEventListener(
+    "click",
+    function(e){
+
+        if(
+            e.target === securityOverlay
+        ){
+
+            securityOverlay.classList.remove(
+                "active"
+            );
+        }
+    }
+);
+
+
+const SECURITY_CONFIRM_MESSAGE =
+    "Vérifiez la provenance de ce fichier avant de continuer.\n" +
+    "N'importez que des PDF ou images provenant d'une source fiable et connue.\n\n" +
+    "Continuer l'import ?";
+
+
+function guardFileInput(
+    inputElement
+){
+
+    /*
+        Écouteur posé en phase de CAPTURE afin de
+        s'exécuter avant les écouteurs "change" déjà
+        attachés plus haut (loadPdf, gestion imgInput).
+
+        Si l'utilisateur annule la confirmation, on stoppe
+        immédiatement la propagation : les écouteurs de
+        chargement ne s'exécutent pas et le champ est vidé.
+    */
+
+    inputElement.addEventListener(
+        "change",
+        function(e){
+
+            if(
+                !e.target.files ||
+                e.target.files.length === 0
+            ){
+
+                return;
+            }
+
+
+            const proceed =
+                window.confirm(
+                    SECURITY_CONFIRM_MESSAGE
+                );
+
+
+            if(!proceed){
+
+                e.stopImmediatePropagation();
+
+                e.preventDefault();
+
+                inputElement.value =
+                    "";
+            }
+        },
+        true
+    );
+}
+
+
+guardFileInput(pdfInput);
+
+guardFileInput(imgInput);
+
+
+/* ==========================================================
+   FIN
+========================================================== */
+
+</script>
+
+</body>
+
+</html>
